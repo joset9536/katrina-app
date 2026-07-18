@@ -1,11 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/katrina/SiteHeader";
 import { Hero } from "@/components/katrina/Hero";
-import { WorldCupBanner } from "@/components/katrina/WorldCupBanner";
+import { Identidad } from "@/components/katrina/Identidad";
+import { Eventos } from "@/components/katrina/Eventos";
 import { MenuGrid } from "@/components/katrina/MenuGrid";
-import { Gallery } from "@/components/katrina/Gallery";
+import { Fidelizacion } from "@/components/katrina/Fidelizacion";
+import { Comunidad } from "@/components/katrina/Comunidad";
 import { SiteFooter } from "@/components/katrina/SiteFooter";
 import { StarField } from "@/components/katrina/StarField";
+import { FloatingSigns } from "@/components/katrina/FloatingSigns";
+import { ChatPanel } from "@/components/katrina/ChatPanel";
+import { MobileBottomBar } from "@/components/katrina/MobileBottomBar";
+
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -19,12 +25,18 @@ function Index() {
         <SiteHeader />
         <main>
           <Hero />
-          <WorldCupBanner />
+          <Identidad />
+          <Eventos />
           <MenuGrid />
-          <Gallery />
+          <Fidelizacion />
+          <Comunidad />
         </main>
         <SiteFooter />
       </div>
+      <FloatingSigns />
+      <ChatPanel />
+      <MobileBottomBar />
+
     </div>
   );
 }

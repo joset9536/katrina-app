@@ -107,8 +107,18 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /* Custom slow scroll handled in JS; leave native as auto to avoid conflicts */
+    scroll-behavior: auto;
   }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
 
   * {
     border-color: var(--color-border);
@@ -292,10 +302,10 @@
   transform: translateY(-4px);
 }
 
-/* Sitewide floating neon dots */
+/* Sitewide floating neon dots — subtle ambient sparkle */
 @keyframes starfield-twinkle {
-  0%, 100% { opacity: 0.25; transform: translateY(0) scale(1); }
-  50% { opacity: 1; transform: translateY(-10px) scale(1.3); }
+  0%, 100% { opacity: 0.08; transform: translateY(0) scale(1); }
+  50% { opacity: 0.32; transform: translateY(-6px) scale(1.12); }
 }
 
 @utility starfield-dot {
@@ -410,10 +420,95 @@
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  letter-spacing: 0;
   animation:
     katrina-flag-cycle 20s ease-in-out infinite,
     katrina-wave-glow 7s ease-in-out infinite;
 }
+
+/* Traveling neon light on KATRINA — narrow bright band sweeps across
+   letters that stay in a dim "unlit tube" tone the rest of the time. */
+@keyframes katrina-title-calm {
+  0%   { background-position: -20% 50%; }
+  100% { background-position: 120% 50%; }
+}
+
+@keyframes katrina-title-hue {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 6px rgba(255, 61, 138, 0.85))
+      drop-shadow(0 0 18px rgba(255, 61, 138, 0.5))
+      drop-shadow(0 0 34px rgba(255, 61, 138, 0.25));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 6px rgba(232, 185, 35, 0.85))
+      drop-shadow(0 0 18px rgba(232, 185, 35, 0.5))
+      drop-shadow(0 0 34px rgba(232, 185, 35, 0.25));
+  }
+}
+
+@utility katrina-title-calm {
+  position: relative;
+  background-image: linear-gradient(
+    100deg,
+    #b8244f 0%,
+    #b8244f 38%,
+    #ff5aa0 46%,
+    #fff2c8 50%,
+    #ffcf5a 54%,
+    #b8244f 62%,
+    #b8244f 100%
+  );
+  background-size: 260% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  letter-spacing: 0;
+  animation:
+    katrina-title-calm 12s linear infinite,
+    katrina-title-hue 12s ease-in-out infinite;
+}
+
+
+@utility hero-katrina-wordmark {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  font-family: "Cinzel", "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-size: clamp(3.2rem, 11vw, 8.5rem);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.12);
+}
+
+@utility hero-logo-shell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(120px, 18vw, 200px);
+  aspect-ratio: 356 / 442;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+}
+
+@utility hero-main {
+  margin-top: clamp(-2rem, -4svh, -0.5rem);
+}
+
+@utility hero-skull-logo {
+  width: clamp(72px, 18vw, 150px) !important;
+  height: auto !important;
+  aspect-ratio: 356 / 442;
+  max-width: 150px;
+}
+
+
+
+
 
 /* Cycle: 10s neon lava-wave → 10s bandera Argentina embedded in the letters */
 @keyframes katrina-flag-cycle {
@@ -680,4 +775,670 @@
 
 @utility btn-pulse {
   animation: btn-pulse 3.2s ease-in-out infinite;
+}
+
+/* ============================================================
+   F0.5 — Breathing logo, liquid title, LED drip, promos, floats
+   ============================================================ */
+
+/* ---- Logo respiración ---- */
+@keyframes katrina-breathe {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(0, -3px, 0) scale(1.025); }
+}
+
+@utility katrina-breathe {
+  animation: katrina-breathe 4s ease-in-out infinite;
+}
+
+/* ---- Real neon tube: a bright band of light travels along the shape,
+       leaving the rest as a dim unlit tube. Uses the PNG as a mask. ---- */
+@keyframes katrina-tube-sweep {
+  0%   { background-position: -40% 50%; }
+  100% { background-position: 140% 50%; }
+}
+
+@keyframes katrina-tube-hue {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 6px rgba(255, 61, 138, 0.9))
+      drop-shadow(0 0 20px rgba(255, 61, 138, 0.55))
+      drop-shadow(0 0 40px rgba(255, 61, 138, 0.3));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 6px rgba(232, 185, 35, 0.9))
+      drop-shadow(0 0 20px rgba(232, 185, 35, 0.55))
+      drop-shadow(0 0 40px rgba(232, 185, 35, 0.3));
+  }
+}
+
+@utility katrina-neon-tube-wrap {
+  display: inline-block;
+  animation: katrina-tube-hue 11s ease-in-out infinite;
+  will-change: filter;
+}
+
+@utility katrina-neon-tube {
+  display: inline-block;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
+  background-color: transparent;
+  background-image: linear-gradient(
+    100deg,
+    #c72860 0%,
+    #c72860 36%,
+    #ff5aa0 46%,
+    #fff2c8 50%,
+    #ffcf5a 54%,
+    #c72860 64%,
+    #c72860 100%
+  );
+  background-size: 260% 100%;
+  background-repeat: no-repeat;
+  animation:
+    katrina-breathe 7s ease-in-out infinite,
+    katrina-tube-sweep 11s linear infinite;
+  transform-origin: 50% 56%;
+  will-change: transform, background-position;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .katrina-neon-tube,
+  .katrina-neon-tube-wrap {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
+
+
+
+/* ---- KATRINA title liquid flow (reduce glow, add flowing background) ---- */
+@keyframes katrina-liquid-flow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@utility katrina-liquid {
+  background-image: linear-gradient(
+    100deg,
+    #8B5CF6 0%,
+    #FF3D8A 18%,
+    #E8B923 34%,
+    #FF6B00 50%,
+    #FF3D8A 66%,
+    #8B5CF6 82%,
+    #74ACDF 100%
+  );
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: katrina-liquid-flow 8s ease-in-out infinite;
+  /* reduced glow ~40% */
+  filter:
+    drop-shadow(0 0 8px rgba(139, 92, 246, 0.35))
+    drop-shadow(0 0 20px rgba(255, 61, 138, 0.2));
+}
+
+/* ---- LED drip border under KATRINA ---- */
+@keyframes led-drip {
+  0%   { transform: translateY(-6px) scaleX(0.6); opacity: 0.2; }
+  40%  { transform: translateY(0) scaleX(1);       opacity: 1; }
+  70%  { transform: translateY(8px) scaleX(0.9);   opacity: 0.8; }
+  100% { transform: translateY(22px) scaleX(0.5);  opacity: 0; }
+}
+
+@keyframes led-outline-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+@utility led-outline {
+  position: relative;
+  display: inline-block;
+}
+
+@utility led-drip-line {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: -6px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    #8B5CF6,
+    #FF3D8A,
+    #E8B923,
+    #FF6B00,
+    #74ACDF,
+    #8B5CF6
+  );
+  background-size: 300% 100%;
+  animation: led-outline-flow 5s ease-in-out infinite;
+  box-shadow:
+    0 0 10px rgba(255, 61, 138, 0.7),
+    0 0 22px rgba(139, 92, 246, 0.5);
+  pointer-events: none;
+}
+
+@utility led-drip-drop {
+  position: absolute;
+  bottom: -6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: radial-gradient(circle, #FF3D8A, #8B5CF6);
+  box-shadow: 0 0 12px rgba(255, 61, 138, 0.8);
+  animation: led-drip 2.6s ease-in infinite;
+  pointer-events: none;
+}
+
+/* ---- Vertical video (9:16 reel) ---- */
+@utility reel-frame {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 32px rgba(139, 92, 246, 0.35),
+    0 0 80px rgba(255, 61, 138, 0.2),
+    inset 0 0 40px rgba(0, 0, 0, 0.5);
+
+  & video {
+    width: 100%;
+    height: auto;
+    max-height: 70vh;
+    object-fit: contain;
+    display: block;
+    background: #000;
+  }
+}
+
+@utility football-night-hero {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(116, 172, 223, 0.38);
+  background-size: cover;
+  background-position: center;
+  padding: clamp(1.4rem, 4vw, 3rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  box-shadow:
+    0 0 34px rgba(116, 172, 223, 0.22),
+    0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+@utility football-match-art {
+  width: min(38vw, 360px);
+  min-width: 220px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 0 24px rgba(116, 172, 223, 0.3),
+    0 0 44px rgba(255, 61, 138, 0.18);
+}
+
+@utility match-board {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(116, 172, 223, 0.1), rgba(139, 92, 246, 0.07), rgba(0, 0, 0, 0.3));
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+@utility team-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(116, 172, 223, 0.34);
+  background: rgba(116, 172, 223, 0.1);
+  padding: 0.45rem 0.75rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+@utility match-card {
+  border-radius: 16px;
+  border: 1px solid rgba(116, 172, 223, 0.3);
+  background: rgba(7, 5, 14, 0.62);
+  padding: 1rem;
+  box-shadow: inset 0 0 34px rgba(116, 172, 223, 0.06);
+}
+
+@utility match-flag {
+  display: inline-block;
+  width: 70px;
+  height: 44px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.flag-france {
+  background: linear-gradient(90deg, #0055a4 0 33.33%, #fff 33.33% 66.66%, #ef4135 66.66% 100%);
+}
+
+.flag-spain {
+  background: linear-gradient(180deg, #aa151b 0 25%, #f1bf00 25% 75%, #aa151b 75% 100%);
+}
+
+.flag-argentina {
+  background: linear-gradient(180deg, #74acdf 0 33.33%, #fff 33.33% 66.66%, #74acdf 66.66% 100%);
+  position: relative;
+}
+
+.flag-argentina::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: #f6b40e;
+  box-shadow: 0 0 0 2px rgba(246, 180, 14, 0.24);
+}
+
+.flag-england {
+  background:
+    linear-gradient(90deg, transparent 0 42%, #ce1124 42% 58%, transparent 58% 100%),
+    linear-gradient(180deg, transparent 0 38%, #ce1124 38% 62%, transparent 62% 100%),
+    #fff;
+}
+
+@utility world-video-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(320px, 1.18fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: clamp(1rem, 3vw, 1.5rem);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(ellipse at 12% 20%, rgba(255, 61, 138, 0.12), transparent 45%),
+    radial-gradient(ellipse at 88% 80%, rgba(116, 172, 223, 0.12), transparent 45%),
+    rgba(9, 6, 18, 0.72);
+  padding: clamp(1rem, 3vw, 1.35rem);
+}
+
+@utility world-video-copy {
+  min-width: 0;
+}
+
+@utility football-video-frame {
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #000;
+  box-shadow:
+    0 0 28px rgba(139, 92, 246, 0.28),
+    0 0 56px rgba(255, 61, 138, 0.14);
+
+  & video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    object-fit: contain;
+    background: #000;
+  }
+}
+
+@utility world-video-quote {
+  min-width: 0;
+}
+
+@utility resilience-card {
+  border-radius: 12px;
+  border: 1px solid rgba(232, 185, 35, 0.22);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.7rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.8rem;
+
+  & cite {
+    margin-top: 0.45rem;
+    display: block;
+    color: rgba(232, 185, 35, 0.82);
+    font-size: 0.68rem;
+    font-style: normal;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+}
+
+@media (max-width: 1023px) {
+  .football-night-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .football-match-art {
+    width: min(100%, 420px);
+  }
+
+  .world-video-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-katrina-wordmark {
+    font-size: clamp(3.8rem, 20vw, 5.2rem);
+  }
+
+  .football-night-hero {
+    min-height: 520px;
+  }
+}
+
+
+
+
+
+
+/* ---- Hero tagline box + header wordmark ---- */
+@utility hero-tag-box {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 61, 138, 0.42);
+  background: linear-gradient(140deg, rgba(139, 92, 246, 0.14), rgba(255, 61, 138, 0.09), rgba(0, 0, 0, 0.35));
+  box-shadow:
+    0 0 18px rgba(255, 61, 138, 0.28),
+    0 0 44px rgba(139, 92, 246, 0.18),
+    inset 0 0 20px rgba(139, 92, 246, 0.1);
+  max-width: 34rem;
+}
+
+@utility hero-tag-kicker {
+  font-size: 0.7rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+@utility hero-tag-line {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+@utility header-katrina-mark {
+  display: inline-block;
+  font-family: "Cinzel", "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-weight: 500;
+  font-size: 1.4rem;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 0.3px rgba(255, 255, 255, 0.22);
+}
+
+@media (min-width: 640px) {
+  .header-katrina-mark { font-size: 2rem; }
+}
+
+/* ---- Video reel (Instagram stacked style) ---- */
+@utility reel-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@utility reel-frame-9x16 {
+  position: relative;
+  width: min(100%, 360px);
+  aspect-ratio: 9 / 16;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 0 32px rgba(139, 92, 246, 0.4),
+    0 0 80px rgba(255, 61, 138, 0.22),
+    inset 0 0 40px rgba(0, 0, 0, 0.6);
+
+  & video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: #000;
+    cursor: pointer;
+  }
+}
+
+@utility reel-sound-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.reel-sound-btn:hover { background: rgba(255, 61, 138, 0.4); transform: scale(1.03); }
+
+@utility reel-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1rem;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.78));
+  color: #fff;
+  pointer-events: none;
+}
+@utility reel-index {
+  display: inline-block;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+@utility reel-title {
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+@utility reel-detail {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+@utility reel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  z-index: 3;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.reel-nav:hover { background: rgba(255, 61, 138, 0.4); transform: translateY(-50%) scale(1.06); }
+.reel-nav-prev { left: 8px; }
+.reel-nav-next { right: 8px; }
+
+@utility reel-dots {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+}
+@utility reel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+@utility reel-dot-active {
+  width: 22px;
+  background: linear-gradient(90deg, #FF3D8A, #8B5CF6);
+  box-shadow: 0 0 10px rgba(255, 61, 138, 0.6);
+}
+
+
+/* ---- FIFA 2026 bracket ---- */
+@utility bracket-box {
+  border: 1px solid rgba(116, 172, 223, 0.35);
+  background: linear-gradient(160deg, rgba(139, 92, 246, 0.08), rgba(0, 0, 0, 0.4));
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.88);
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 140px;
+  box-shadow: 0 0 12px rgba(116, 172, 223, 0.15);
+}
+
+@utility bracket-score {
+  color: #E8B923;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility bracket-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(116, 172, 223, 0.9);
+  margin-bottom: 6px;
+}
+
+/* ---- Promo cards ---- */
+@keyframes promo-border-rotate {
+  0%   { border-color: rgba(255, 61, 138, 0.6);  box-shadow: 0 0 22px rgba(255, 61, 138, 0.28); }
+  25%  { border-color: rgba(232, 185, 35, 0.65); box-shadow: 0 0 22px rgba(232, 185, 35, 0.28); }
+  50%  { border-color: rgba(139, 92, 246, 0.65); box-shadow: 0 0 22px rgba(139, 92, 246, 0.28); }
+  75%  { border-color: rgba(116, 172, 223, 0.65); box-shadow: 0 0 22px rgba(116, 172, 223, 0.28); }
+  100% { border-color: rgba(255, 61, 138, 0.6);  box-shadow: 0 0 22px rgba(255, 61, 138, 0.28); }
+}
+
+@utility promo-card {
+  position: relative;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 61, 138, 0.6);
+  background: linear-gradient(160deg, rgba(30, 20, 50, 0.85), rgba(10, 8, 20, 0.9));
+  padding: 1.5rem;
+  transition: transform 0.35s ease;
+  animation: promo-border-rotate 8s ease-in-out infinite;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+}
+
+@utility promo-price {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+  font-weight: 700;
+  background: linear-gradient(90deg, #E8B923, #FF6B00);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 12px rgba(232, 185, 35, 0.4));
+}
+
+@utility promo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---- Floating neon signs ---- */
+@keyframes float-sign-in {
+  0%   { transform: translateX(120%); opacity: 0; }
+  100% { transform: translateX(0);    opacity: 1; }
+}
+
+@utility float-sign {
+  animation: float-sign-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  border-radius: 14px;
+  padding: 0.7rem 2.2rem 0.7rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(140deg, rgba(20, 12, 30, 0.92), rgba(8, 6, 16, 0.94));
+  backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  min-width: 220px;
+  max-width: 280px;
+  position: relative;
+}
+
+@utility float-sign-close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
+  line-height: 1;
+  transition: color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+  }
 }

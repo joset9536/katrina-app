@@ -83,14 +83,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Katrina · Cocktail bar en Orán. Coctelería de autor, ambiente nocturno y ritual. Reservá tu mesa por WhatsApp.",
       },
-      { property: "og:title", content: "Katrina — Cocktail Bar" },
+      { property: "og:title", content: "Katrina — Cocktail Bar · Orán" },
       {
         property: "og:description",
-        content: "Cocktails · Nights · Ritual. Cocktail bar premium en Orán.",
+        content: "Katrina · Cocktail bar en Orán. Coctelería de autor, ambiente nocturno y ritual. Reservá tu mesa por WhatsApp.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#0b0a12" },
+      { name: "twitter:title", content: "Katrina — Cocktail Bar · Orán" },
+      { name: "twitter:description", content: "Katrina · Cocktail bar en Orán. Coctelería de autor, ambiente nocturno y ritual. Reservá tu mesa por WhatsApp." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/166f27cc-cc44-456e-b913-b814ffc1ad38/id-preview-b1c384f0--f1c81c5c-550d-4cca-b2b1-62bd01251e05.lovable.app-1783989257103.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/166f27cc-cc44-456e-b913-b814ffc1ad38/id-preview-b1c384f0--f1c81c5c-550d-4cca-b2b1-62bd01251e05.lovable.app-1783989257103.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -103,7 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600&family=Pinyon+Script&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600&family=Pinyon+Script&display=swap",
       },
     ],
   }),

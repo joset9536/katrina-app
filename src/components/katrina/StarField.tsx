@@ -8,7 +8,7 @@ function seeded(i: number, salt: number) {
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
-const DOTS = Array.from({ length: 22 }).map((_, i) => ({
+const DOTS = Array.from({ length: 44 }).map((_, i) => ({
   left: `${r2(seeded(i, 1) * 100)}%`,
   top: `${r2(seeded(i, 2) * 100)}%`,
   size: r2(2 + seeded(i, 3) * 3),
@@ -23,7 +23,11 @@ const DOTS = Array.from({ length: 22 }).map((_, i) => ({
  */
 export function StarField() {
   return (
-    <div className="starfield pointer-events-none fixed inset-0 z-0" aria-hidden>
+    <div
+      className="starfield pointer-events-none fixed inset-0 z-0"
+      style={{ opacity: 0.35 }}
+      aria-hidden
+    >
       {DOTS.map((d, i) => (
         <span
           key={i}
@@ -34,7 +38,7 @@ export function StarField() {
             width: d.size,
             height: d.size,
             background: d.color,
-            boxShadow: `0 0 ${d.size * 1.6}px ${d.color}`,
+            boxShadow: `0 0 ${d.size * 1.1}px ${d.color}`,
             animationDuration: `${d.duration}s`,
             animationDelay: `${d.delay}s`,
             willChange: "transform, opacity",
