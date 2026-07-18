@@ -1,15 +1,15 @@
 import { useInView } from "@/hooks/use-in-view";
 
-import patio01Asset from "@/assets/patio/patio-01.png.asset.json";
-const patio01 = patio01Asset.url;
-import patio02Asset from "@/assets/patio/patio-02.png.asset.json";
-const patio02 = patio02Asset.url;
-import patio03Asset from "@/assets/patio/patio-03.png.asset.json";
-const patio03 = patio03Asset.url;
-import patio04Asset from "@/assets/patio/patio-04.png.asset.json";
-const patio04 = patio04Asset.url;
-import patio05Asset from "@/assets/patio/patio-05.png.asset.json";
-const patio05 = patio05Asset.url;
+import patio01Asset from "@/assets/patio/patio-01.png";
+const patio01 = patio01Asset;
+import patio02Asset from "@/assets/patio/patio-02.png";
+const patio02 = patio02Asset;
+import patio03Asset from "@/assets/patio/patio-03.png";
+const patio03 = patio03Asset;
+import patio04Asset from "@/assets/patio/patio-04.png";
+const patio04 = patio04Asset;
+import patio05Asset from "@/assets/patio/patio-05.png";
+const patio05 = patio05Asset;
 const BORDER_COLORS = ["#FF3D8A", "#E8B923", "#8B5CF6", "#74ACDF", "#FF6B00"];
 
 const PHOTOS = [

@@ -4,22 +4,22 @@ import { useInView } from "@/hooks/use-in-view";
 import { MapPin } from "lucide-react";
 import { NeonButton } from "./NeonButton";
 
-import patio01Asset from "@/assets/patio/patio-01.png.asset.json";
-import patio02Asset from "@/assets/patio/patio-02.png.asset.json";
-import patio03Asset from "@/assets/patio/patio-03.png.asset.json";
-import patio04Asset from "@/assets/patio/patio-04.png.asset.json";
-import patio05Asset from "@/assets/patio/patio-05.png.asset.json";
+import patio01Asset from "@/assets/patio/patio-01.png";
+import patio02Asset from "@/assets/patio/patio-02.png";
+import patio03Asset from "@/assets/patio/patio-03.png";
+import patio04Asset from "@/assets/patio/patio-04.png";
+import patio05Asset from "@/assets/patio/patio-05.png";
 
 const BORDER_COLORS = ["#FF3D8A", "#E8B923", "#8B5CF6", "#74ACDF", "#FF6B00"];
 
 type Photo = { src?: string; label: string };
 
 const PHOTOS: Photo[] = [
-  { src: patio01Asset.url, label: "Patio" },
-  { src: patio02Asset.url, label: "Ambiente" },
-  { src: patio03Asset.url, label: "Segundo piso" },
-  { src: patio04Asset.url, label: "Entrada" },
-  { src: patio05Asset.url, label: "Frente" },
+  { src: patio01Asset, label: "Patio" },
+  { src: patio02Asset, label: "Ambiente" },
+  { src: patio03Asset, label: "Segundo piso" },
+  { src: patio04Asset, label: "Entrada" },
+  { src: patio05Asset, label: "Frente" },
   { label: "Terraza" },
   { label: "Cafetería" },
   { label: "VIP" },

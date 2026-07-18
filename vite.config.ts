@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Self-hosted en Hostinger (Node.js), no Cloudflare Workers.
+  // Este override solo aplica fuera del sandbox de Lovable (ver README del paquete).
+  nitro: {
+    preset: "node-server",
+  },
 });

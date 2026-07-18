@@ -1,5 +1,5 @@
-import faceAsset from "@/assets/katrina-logo-clean.png.asset.json";
-const face = faceAsset.url;
+import faceAsset from "@/assets/katrina-logo-clean.png";
+const face = faceAsset;
 
 type Props = { className?: string; size?: number };
 

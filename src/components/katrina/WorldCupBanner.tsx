@@ -2,23 +2,23 @@ import { NeonButton } from "./NeonButton";
 import { PromosSection } from "./PromosSection";
 import { VideoReel, type ReelClip } from "./VideoReel";
 
-import argHolandaAsset from "@/assets/videos/arg-holanda.mp4.asset.json";
-import asadoSeleccionAsset from "@/assets/videos/asado-seleccion.mp4.asset.json";
-import julianGolAsset from "@/assets/videos/julian-gol-suecia.mp4.asset.json";
-import argHolandaPosterAsset from "@/assets/posters/arg-holanda-poster.jpg.asset.json";
-import asadoSeleccionPosterAsset from "@/assets/posters/asado-seleccion-poster.jpg.asset.json";
-import julianGolPosterAsset from "@/assets/posters/julian-gol-suecia-poster.jpg.asset.json";
-import hinchasAsset from "@/assets/futbol/hinchas-argentinos.webp.asset.json";
-import argentinaVsInglaterraAsset from "@/assets/futbol/argentina-vs-inglaterra.webp.asset.json";
+import argHolandaAsset from "@/assets/videos/arg-holanda.mp4";
+import asadoSeleccionAsset from "@/assets/videos/asado-seleccion.mp4";
+import julianGolAsset from "@/assets/videos/julian-gol-suecia.mp4";
+import argHolandaPosterAsset from "@/assets/posters/arg-holanda-poster.jpg";
+import asadoSeleccionPosterAsset from "@/assets/posters/asado-seleccion-poster.jpg";
+import julianGolPosterAsset from "@/assets/posters/julian-gol-suecia-poster.jpg";
+import hinchasAsset from "@/assets/futbol/hinchas-argentinos.webp";
+import argentinaVsInglaterraAsset from "@/assets/futbol/argentina-vs-inglaterra.webp";
 
-const argHolanda = argHolandaAsset.url;
-const asadoSeleccion = asadoSeleccionAsset.url;
-const julianGol = julianGolAsset.url;
-const argHolandaPoster = argHolandaPosterAsset.url;
-const asadoSeleccionPoster = asadoSeleccionPosterAsset.url;
-const julianGolPoster = julianGolPosterAsset.url;
-const hinchas = hinchasAsset.url;
-const argentinaVsInglaterra = argentinaVsInglaterraAsset.url;
+const argHolanda = argHolandaAsset;
+const asadoSeleccion = asadoSeleccionAsset;
+const julianGol = julianGolAsset;
+const argHolandaPoster = argHolandaPosterAsset;
+const asadoSeleccionPoster = asadoSeleccionPosterAsset;
+const julianGolPoster = julianGolPosterAsset;
+const hinchas = hinchasAsset;
+const argentinaVsInglaterra = argentinaVsInglaterraAsset;
 
 const WHATSAPP = "https://wa.me/5493878631310";
 
