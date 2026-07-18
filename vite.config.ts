@@ -12,9 +12,12 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  // Self-hosted en Hostinger (Node.js), no Cloudflare Workers.
+  // Self-hosted, no Cloudflare Workers. Preset configurable por variable de entorno
+  // para poder deployar tanto en Vercel (gratis, demo) como en Hostinger (Node.js, definitivo)
+  // sin tener que editar este archivo cada vez. Vercel setea NITRO_PRESET=vercel solo;
+  // si no está seteada (build local o en Hostinger), cae en node-server.
   // Este override solo aplica fuera del sandbox de Lovable (ver README del paquete).
   nitro: {
-    preset: "node-server",
+    preset: process.env.NITRO_PRESET || "node-server",
   },
 });
