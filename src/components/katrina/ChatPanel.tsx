@@ -235,6 +235,18 @@ export function ChatPanel() {
               <p className="text-xs text-white/70">
                 Contanos tu nombre y en qué mesa estás para llamar al staff.
               </p>
+              <p className="text-[11px] text-white/40">
+                Para una atención más personal, también podés escribirnos directo por{" "}
+                <a
+                  href="https://wa.me/5493878631310"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#FF3D8A] underline"
+                >
+                  WhatsApp
+                </a>
+                .
+              </p>
               <input
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value)}
