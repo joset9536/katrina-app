@@ -32,7 +32,7 @@ export function SiteFooter() {
               <Clock size={18} className="mt-0.5 text-white/70" />
               <div>
                 <p className="text-sm">Todos los días</p>
-                <p className="text-sm text-white/60">16:00 · 02:00 hs</p>
+                <p className="text-sm text-white/60">19:00 · 02:00 hs</p>
               </div>
             </div>
           </div>

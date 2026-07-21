@@ -14,9 +14,9 @@ type Combo = {
 
 const COMIDAS: Combo[] = [
   {
-    id: "texas-burguer",
+    id: "arterias-de-katrina",
     chip: "Combo estrella",
-    title: "Texas Burguer",
+    title: "Arterias de Katrina",
     desc: "Doble carne 150gr c/u, bacon, cheddar, salsa americana y huevo. Con papas + Coca 1L o cerveza.",
     price: "$20.000",
   },

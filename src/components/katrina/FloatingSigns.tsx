@@ -30,7 +30,7 @@ const SIGNS: Sign[] = [
     id: "burger-day",
     emoji: "🍔",
     title: "Día de la Hamburguesa",
-    subtitle: "Texas Burguer + papas + bebida",
+    subtitle: "Arterias de Katrina + papas + bebida",
     color: "#E8B923",
     href: "#promos",
   },
