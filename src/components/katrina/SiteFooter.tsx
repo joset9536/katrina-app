@@ -18,7 +18,7 @@ export function SiteFooter() {
             <div className="mt-3 flex items-start gap-3">
               <MapPin size={18} className="mt-0.5 text-white/70" />
               <div>
-                <p className="text-sm">Egüés 502</p>
+                <p className="text-sm">Egüés 517</p>
                 <p className="text-sm text-white/60">Orán, Salta</p>
               </div>
             </div>
@@ -63,7 +63,7 @@ export function SiteFooter() {
         <div className="mt-16 flex flex-col items-center gap-3 border-t border-white/10 pt-8">
           <KatrinaMark size={48} />
           <p className="text-xs uppercase tracking-[0.35em] text-white/50">
-            Katrina · Neón · Orán
+            Katrina · Orán, Salta
           </p>
         </div>
       </div>

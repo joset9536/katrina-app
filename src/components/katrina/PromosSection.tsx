@@ -103,8 +103,8 @@ function CandyCarousel() {
             Nuestros más pedidos
           </h3>
           <p className="mt-2 max-w-md text-sm leading-relaxed text-white/70">
-            ¡Probá nuestros cócteles candy! Colores intensos, sabores dulces,
-            estilo Texas. Próximamente fotos reales.
+            ¡Probá nuestros cócteles candy! Colores intensos, sabores dulces.
+            Próximamente fotos reales.
           </p>
         </div>
       </div>
@@ -153,7 +153,7 @@ export function PromosSection() {
   return (
     <section id="promos" aria-label="Combos y promos" className="mt-20">
       <div className="mb-8 text-center">
-        <span className="wc-kicker">Resto-Bar Texas · Egüés 502</span>
+        <span className="wc-kicker">Katrina · Egüés 517</span>
         <h2 className="wc-title wc-title-sm mt-4">Combos y Promos</h2>
         <p className="wc-detail mt-3">Delivery al 3878 631310 · retiro en el local</p>
       </div>

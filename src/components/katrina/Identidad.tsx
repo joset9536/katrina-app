@@ -8,7 +8,6 @@ import patio01Asset from "@/assets/patio/patio-01.png";
 import patio02Asset from "@/assets/patio/patio-02.png";
 import patio03Asset from "@/assets/patio/patio-03.png";
 import patio04Asset from "@/assets/patio/patio-04.png";
-import patio05Asset from "@/assets/patio/patio-05.png";
 
 const BORDER_COLORS = ["#FF3D8A", "#E8B923", "#8B5CF6", "#74ACDF", "#FF6B00"];
 
@@ -19,7 +18,7 @@ const PHOTOS: Photo[] = [
   { src: patio02Asset, label: "Ambiente" },
   { src: patio03Asset, label: "Segundo piso" },
   { src: patio04Asset, label: "Entrada" },
-  { src: patio05Asset, label: "Frente" },
+  { label: "Frente" },
   { label: "Terraza" },
   { label: "Cafetería" },
   { label: "VIP" },
@@ -30,7 +29,7 @@ const PHOTOS: Photo[] = [
 
 const MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=" +
-  encodeURIComponent("Egüés 502, Orán, Salta");
+  encodeURIComponent("Egüés 517, Orán, Salta");
 
 export function Identidad() {
   const { ref, visible } = useInView<HTMLDivElement>();
@@ -84,7 +83,7 @@ export function Identidad() {
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <div className="flex items-center gap-2 text-sm text-white/80">
               <MapPin size={16} className="text-white/60" />
-              Egüés 502, Orán, Salta
+              Egüés 517, Orán, Salta
             </div>
             <NeonButton
               href={MAPS_URL}
@@ -96,10 +95,6 @@ export function Identidad() {
             </NeonButton>
           </div>
 
-          <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-white/60">
-            Vas a encontrarnos con el cartel de <span className="text-white/80">Texas</span> en el frente:
-            es el mismo lugar de siempre. Estamos en transición a Katrina y la fachada se renueva más adelante.
-          </p>
         </div>
 
 

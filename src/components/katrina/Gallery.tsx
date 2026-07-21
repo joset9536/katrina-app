@@ -8,8 +8,6 @@ import patio03Asset from "@/assets/patio/patio-03.png";
 const patio03 = patio03Asset;
 import patio04Asset from "@/assets/patio/patio-04.png";
 const patio04 = patio04Asset;
-import patio05Asset from "@/assets/patio/patio-05.png";
-const patio05 = patio05Asset;
 const BORDER_COLORS = ["#FF3D8A", "#E8B923", "#8B5CF6", "#74ACDF", "#FF6B00"];
 
 const PHOTOS = [
@@ -17,7 +15,6 @@ const PHOTOS = [
   { src: patio02, label: "Ambiente" },
   { src: patio03, label: "Segundo piso" },
   { src: patio04, label: "Entrada" },
-  { src: patio05, label: "Frente del local" },
 ];
 
 export function Gallery() {
