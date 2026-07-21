@@ -59,10 +59,15 @@ export function ChatPanel() {
     if (!open || !ready) return;
     let active = true;
 
+    // Solo mensajes de las ultimas 12hs: el chat es por mesa, no por cliente,
+    // asi que sin este corte un cliente nuevo veria la charla de mesas anteriores.
+    const cutoff = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
+
     supabase
       .from("chat")
       .select("*")
       .eq("mesa_id", mesaKey)
+      .gte("created_at", cutoff)
       .order("created_at", { ascending: true })
       .limit(100)
       .then(({ data }) => {
