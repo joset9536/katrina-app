@@ -1,6 +1,5 @@
 import { MessageCircle, UtensilsCrossed } from "lucide-react";
-
-const WHATSAPP = "https://wa.me/5493878631310";
+import { whatsappOrderUrl } from "@/lib/whatsapp";
 
 export function MobileBottomBar() {
   return (
@@ -11,7 +10,7 @@ export function MobileBottomBar() {
       <div className="pointer-events-none absolute inset-x-0 -top-6 h-6 bg-gradient-to-t from-[#0b0713] to-transparent" />
       <div className="mx-3 mb-3 flex items-stretch gap-2 rounded-2xl border border-white/10 bg-[#0b0713]/95 p-2 shadow-2xl backdrop-blur-md">
         <a
-          href={WHATSAPP}
+          href={whatsappOrderUrl()}
           target="_blank"
           rel="noopener noreferrer"
           className="flex flex-[2] items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white"

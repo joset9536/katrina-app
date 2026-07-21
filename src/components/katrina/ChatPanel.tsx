@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MessageCircle, Send, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { whatsappOrderUrl } from "@/lib/whatsapp";
 
 type ChatMsg = {
   id: string;
@@ -238,7 +239,7 @@ export function ChatPanel() {
               <p className="text-[11px] text-white/40">
                 Para una atención más personal, también podés escribirnos directo por{" "}
                 <a
-                  href="https://wa.me/5493878631310"
+                  href={whatsappOrderUrl()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#FF3D8A] underline"

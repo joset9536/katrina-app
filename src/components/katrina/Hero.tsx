@@ -1,7 +1,6 @@
 import { NeonButton } from "./NeonButton";
 import { useInView } from "@/hooks/use-in-view";
-
-const WHATSAPP = "https://wa.me/5493878631310";
+import { whatsappOrderUrl } from "@/lib/whatsapp";
 
 export function Hero() {
   const { ref, visible } = useInView<HTMLDivElement>({ threshold: 0.1 });
@@ -34,7 +33,7 @@ export function Hero() {
 
           <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row">
             <NeonButton
-              href={WHATSAPP}
+              href={whatsappOrderUrl()}
               target="_blank"
               rel="noopener noreferrer"
               variant="primary"

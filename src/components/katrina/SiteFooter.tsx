@@ -1,6 +1,7 @@
 import { Instagram, MapPin, Clock, Phone } from "lucide-react";
 import { KatrinaMark } from "./KatrinaMark";
 import { useInView } from "@/hooks/use-in-view";
+import { whatsappOrderUrl } from "@/lib/whatsapp";
 
 export function SiteFooter() {
   const { ref, visible } = useInView<HTMLDivElement>();
@@ -43,7 +44,7 @@ export function SiteFooter() {
             </span>
             <div className="mt-3 flex flex-col gap-3">
               <a
-                href="https://wa.me/5493878631310"
+                href={whatsappOrderUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="nav-link inline-flex items-center gap-2 text-sm"

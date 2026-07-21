@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { whatsappOrderUrl } from "@/lib/whatsapp";
 
 type Sign = {
   id: string;
@@ -16,7 +17,6 @@ const SIGNS: Sign[] = [
     title: "Candy Coctels",
     subtitle: "Colores intensos, sabores dulces",
     color: "#8B5CF6",
-    href: "#promos",
   },
   {
     id: "2x1",
@@ -24,7 +24,6 @@ const SIGNS: Sign[] = [
     title: "2×1 todos los días",
     subtitle: "Vodka · Gin Tonic · Fernet",
     color: "#FF3D8A",
-    href: "#promos",
   },
   {
     id: "burger-day",
@@ -32,7 +31,6 @@ const SIGNS: Sign[] = [
     title: "Día de la Hamburguesa",
     subtitle: "Arterias de Katrina + papas + bebida",
     color: "#E8B923",
-    href: "#promos",
   },
   {
     id: "smirnoff",
@@ -40,7 +38,6 @@ const SIGNS: Sign[] = [
     title: "Smirnoff + 2 Speed",
     subtitle: "$28.000 · botella + energizantes",
     color: "#74ACDF",
-    href: "#promos",
   },
 ];
 
@@ -121,7 +118,9 @@ export function FloatingSigns() {
     >
       <a
         key={sign.id}
-        href={sign.href ?? "#promos"}
+        href={sign.href ?? whatsappOrderUrl()}
+        target="_blank"
+        rel="noopener noreferrer"
         className="float-sign pointer-events-auto flex items-center gap-3 no-underline"
         style={{
           borderColor: `${sign.color}66`,
