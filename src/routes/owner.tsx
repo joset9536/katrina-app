@@ -36,10 +36,17 @@ function OwnerPage() {
     const load = async () => {
       const startDay = new Date();
       startDay.setHours(0, 0, 0, 0);
+      // "Activo" = mando un heartbeat en los ultimos 10 min. Evita contar
+      // mozos que cerraron el navegador sin apretar "Cerrar turno".
+      const staffCutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
       const [mesas, cola, staff, resueltos] = await Promise.all([
         supabase.from("mesas").select("estado"),
         supabase.from("llamados").select("prioridad,status").eq("status", "en_espera"),
-        supabase.from("staff_turnos").select("estado").eq("estado", "activo"),
+        supabase
+          .from("staff_turnos")
+          .select("estado")
+          .eq("estado", "activo")
+          .gte("updated_at", staffCutoff),
         supabase
           .from("llamados")
           .select("timestamp,respondido_at,status")
