@@ -3,6 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ColaLlamados } from "@/components/katrina/staff/ColaLlamados";
 import { MisLlamados } from "@/components/katrina/staff/MisLlamados";
 import { MapaMesasRef } from "@/components/katrina/staff/MapaMesasRef";
+import { PinGate } from "@/components/katrina/PinGate";
+
+const STAFF_PIN = import.meta.env.VITE_STAFF_PIN || process.env.STAFF_PIN || "katrina-mozos";
 
 export const Route = createFileRoute("/staff")({
   head: () => ({
@@ -11,7 +14,11 @@ export const Route = createFileRoute("/staff")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: StaffPage,
+  component: () => (
+    <PinGate title="Acceso staff" pin={STAFF_PIN} storageKey="katrina_staff_pin_ok">
+      <StaffPage />
+    </PinGate>
+  ),
 });
 
 const STORAGE = "katrina_staff_nombre";

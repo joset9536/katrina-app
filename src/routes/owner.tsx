@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { PinGate } from "@/components/katrina/PinGate";
+
+const OWNER_PIN = import.meta.env.VITE_OWNER_PIN || process.env.OWNER_PIN || "katrina-gerencia";
 
 export const Route = createFileRoute("/owner")({
   head: () => ({
@@ -9,7 +12,11 @@ export const Route = createFileRoute("/owner")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: OwnerPage,
+  component: () => (
+    <PinGate title="Dashboard gerencia" pin={OWNER_PIN} storageKey="katrina_owner_pin_ok">
+      <OwnerPage />
+    </PinGate>
+  ),
 });
 
 type Metrics = {
