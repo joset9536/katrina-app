@@ -69,50 +69,31 @@ function EventoProximamente({
 }
 
 
-function FinalMundialBanner() {
+function FinalMundialRecuerdo() {
   return (
     <article
       className="relative overflow-hidden rounded-xl border p-5"
       style={{
         borderColor: "#74ACDF",
         background:
-          "linear-gradient(160deg, rgba(116,172,223,0.18) 0%, rgba(14,10,26,0.9) 45%, rgba(232,185,35,0.18) 100%)",
-        boxShadow:
-          "0 0 24px color-mix(in oklab, #74ACDF 40%, transparent), inset 0 0 40px rgba(14,10,26,0.6)",
+          "linear-gradient(160deg, rgba(116,172,223,0.10) 0%, rgba(14,10,26,0.9) 45%, rgba(232,185,35,0.08) 100%)",
+        boxShadow: "inset 0 0 30px rgba(0,0,0,0.4)",
       }}
     >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          background:
-            "repeating-linear-gradient(180deg, rgba(116,172,223,0.35) 0 14px, transparent 14px 28px, rgba(255,255,255,0.25) 28px 42px, transparent 42px 56px, rgba(116,172,223,0.35) 56px 70px)",
-          mixBlendMode: "screen",
-        }}
-      />
       <div className="relative">
         <span
           className="text-[10px] uppercase tracking-[0.4em]"
-          style={{ color: "#E8B923" }}
+          style={{ color: "color-mix(in oklab, white 70%, transparent)" }}
         >
-          Evento imperdible
+          Evento pasado
         </span>
-        <h4
-          className="mt-2 font-display text-2xl leading-tight"
-          style={{
-            color: "#fff",
-            textShadow:
-              "0 0 8px #74ACDF, 0 0 18px #74ACDF, 0 0 28px rgba(232,185,35,0.6)",
-          }}
-        >
+        <h4 className="mt-2 font-display text-xl leading-tight text-white/90">
           Final del Mundial
           <br />
-          <span style={{ color: "#E8B923" }}>Argentina vs España</span>
+          Argentina vs España
         </h4>
-        <p className="mt-3 text-xs uppercase tracking-[0.25em] text-white/80">
-          Domingo 19/7 · 16:00 hs (hora Argentina) · Pantalla gigante
-        </p>
-        <p className="mt-1 text-xs text-white/60">
-          Reservá tu mesa albiceleste con anticipación.
+        <p className="mt-2 text-xs text-white/50">
+          Pantalla gigante, la barra completa. Gracias por vivirla con nosotros.
         </p>
       </div>
     </article>
@@ -140,7 +121,7 @@ export function Eventos() {
           <div>
             <h3 className="mb-4 font-display text-2xl">Próximos eventos</h3>
             <div className="grid gap-4 md:grid-cols-3">
-              <FinalMundialBanner />
+              <EventoProximamente index={0} variant="next" />
               <EventoProximamente index={1} variant="next" />
               <EventoProximamente index={2} variant="next" />
             </div>
@@ -149,7 +130,7 @@ export function Eventos() {
           <div>
             <h3 className="mb-4 font-display text-2xl">Eventos realizados</h3>
             <div className="grid gap-4 md:grid-cols-3">
-              <EventoProximamente index={0} variant="past" />
+              <FinalMundialRecuerdo />
               <EventoProximamente index={1} variant="past" />
               <EventoProximamente index={2} variant="past" />
             </div>

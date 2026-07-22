@@ -3,6 +3,7 @@ import { Bot, MessageCircle, Send, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { whatsappOrderUrl } from "@/lib/whatsapp";
 import { askKatrinaAi } from "@/lib/katrina-ai";
+import { onOrderRequested } from "@/lib/order-bridge";
 
 type AiTurn = { role: "user" | "assistant"; content: string };
 
@@ -31,7 +32,8 @@ const STORAGE_LLAMADO = "katrina_chat_llamado";
 
 export function ChatPanel() {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<"ai" | "mozo">("ai");
+  const [mode, setMode] = useState<"ai" | "mozo">("mozo");
+  const [pendingOrder, setPendingOrder] = useState<string | null>(null);
   const [aiMessages, setAiMessages] = useState<AiTurn[]>([]);
   const [aiInput, setAiInput] = useState("");
   const [aiSending, setAiSending] = useState(false);
@@ -193,18 +195,17 @@ export function ChatPanel() {
     await supabase.from("mesas").update({ estado: "ocupada" }).eq("id", mesaId);
   };
 
-  const send = async () => {
-    const text = input.trim();
-    if (!text || sending) return;
+  const sendText = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || sending) return false;
     setSending(true);
-    const isUrgente = /urgente/i.test(text);
+    const isUrgente = /urgente/i.test(trimmed);
     const { error } = await supabase.from("chat").insert({
-      mensaje: text,
+      mensaje: trimmed,
       usuario,
       mesa_id: mesaKey,
       tipo: "cliente",
     });
-    if (!error) setInput("");
 
     if (isUrgente && llamadoId) {
       await supabase.from("llamados").update({ prioridad: 1 }).eq("id", llamadoId);
@@ -216,7 +217,28 @@ export function ChatPanel() {
       await createLlamado(usuario, mesaKey);
     }
     setSending(false);
+    return !error;
   };
+
+  const send = async () => {
+    if (!input.trim()) return;
+    const ok = await sendText(input);
+    if (ok) setInput("");
+  };
+
+  // "Pedir este" en la carta dispara este evento en vez de ir directo a
+  // WhatsApp — asi el pedido entra al mismo sistema en vivo que ve /staff.
+  useEffect(() => {
+    return onOrderRequested((text) => {
+      setOpen(true);
+      setMode("mozo");
+      if (ready) {
+        sendText(text);
+      } else {
+        setPendingOrder(text);
+      }
+    });
+  }, [ready, usuario, mesaKey, llamadoId, llamado]);
 
   const saveIdentity = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -227,6 +249,15 @@ export function ChatPanel() {
     localStorage.setItem(STORAGE_MESA, m);
     setReady(true);
     await createLlamado(u, `mesa-${m}`);
+    if (pendingOrder) {
+      await supabase.from("chat").insert({
+        mensaje: pendingOrder,
+        usuario: u,
+        mesa_id: `mesa-${m}`,
+        tipo: "cliente",
+      });
+      setPendingOrder(null);
+    }
   };
 
   const askAi = async () => {
@@ -286,20 +317,20 @@ export function ChatPanel() {
             </div>
             <div className="flex gap-1 px-3 pb-2 pt-2">
               <button
-                onClick={() => setMode("ai")}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  mode === "ai" ? "bg-[#8B5CF6] text-white" : "text-white/50 hover:text-white"
-                }`}
-              >
-                <Bot size={14} /> Asistente
-              </button>
-              <button
                 onClick={() => setMode("mozo")}
                 className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
                   mode === "mozo" ? "bg-[#FF3D8A] text-[#0E0A1A]" : "text-white/50 hover:text-white"
                 }`}
               >
                 <MessageCircle size={14} /> Llamar mozo
+              </button>
+              <button
+                onClick={() => setMode("ai")}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                  mode === "ai" ? "bg-[#8B5CF6] text-white" : "text-white/50 hover:text-white"
+                }`}
+              >
+                <Bot size={14} /> Asistente
               </button>
             </div>
             {ready && mode === "mozo" && (
@@ -360,9 +391,17 @@ export function ChatPanel() {
             </>
           ) : !ready ? (
             <form onSubmit={saveIdentity} className="flex flex-1 flex-col justify-center gap-3 px-5">
-              <p className="text-xs text-white/70">
-                Contanos tu nombre y en qué mesa estás para llamar al staff.
-              </p>
+              {pendingOrder ? (
+                <p className="rounded-md border border-[#FF3D8A]/40 bg-[#FF3D8A]/10 px-3 py-2 text-xs text-white/80">
+                  Vas a pedir: <span className="font-semibold">{pendingOrder.replace("Quiero pedir: ", "")}</span>
+                  <br />
+                  Decinos tu nombre y confirmá la mesa para mandarlo.
+                </p>
+              ) : (
+                <p className="text-xs text-white/70">
+                  Contanos tu nombre y en qué mesa estás para llamar al staff.
+                </p>
+              )}
               <p className="text-[11px] text-white/40">
                 Para una atención más personal, también podés escribirnos directo por{" "}
                 <a

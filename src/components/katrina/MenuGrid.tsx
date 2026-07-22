@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { useInView } from "@/hooks/use-in-view";
-import { whatsappItemUrl } from "@/lib/whatsapp";
+import { requestOrder } from "@/lib/order-bridge";
 
 
 import classicBurgerAsset from "@/assets/carta/classic-burger.jpg";
@@ -296,7 +296,9 @@ function MenuCard({
 }) {
   const { ref, visible } = useInView<HTMLDivElement>();
   const [expanded, setExpanded] = useState(false);
-  const orderUrl = whatsappItemUrl(item.name, item.price ?? item.priceWhole);
+  const orderText = `Quiero pedir: ${item.name}${
+    item.price ?? item.priceWhole ? ` (${item.price ?? item.priceWhole})` : ""
+  }`;
   const priceNode = !pizzaMode && item.price ? (
     <span
       className="whitespace-nowrap text-sm font-semibold"
@@ -355,15 +357,16 @@ function MenuCard({
               <PizzaPrice label="Media" value={item.priceHalf} />
             </div>
           )}
-          <a
-            href={orderUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="mt-3 flex items-center justify-center gap-2 rounded-full bg-[#FF3D8A] px-4 py-2 text-xs font-semibold text-[#0E0A1A]"
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              requestOrder(orderText);
+            }}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-[#FF3D8A] px-4 py-2 text-xs font-semibold text-[#0E0A1A]"
           >
             <MessageCircle size={14} /> Pedir este
-          </a>
+          </button>
         </div>
       )}
 
@@ -397,14 +400,13 @@ function MenuCard({
               <PizzaPrice label="Media" value={item.priceHalf} />
             </div>
           )}
-          <a
-            href={orderUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => requestOrder(orderText)}
             className="mt-4 flex items-center justify-center gap-2 rounded-full bg-[#FF3D8A] px-4 py-2 text-sm font-semibold text-[#0E0A1A] transition hover:bg-[#ff5c9d]"
           >
             <MessageCircle size={16} /> Pedir este
-          </a>
+          </button>
         </div>
       </div>
     </div>
