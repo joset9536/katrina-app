@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { whatsappOrderUrl } from "@/lib/whatsapp";
 import { askKatrinaAi } from "@/lib/katrina-ai";
 import { onOrderRequested } from "@/lib/order-bridge";
+import { logToSheets } from "@/lib/sheets-log";
 
 type AiTurn = { role: "user" | "assistant"; content: string };
 
@@ -191,6 +192,14 @@ export function ChatPanel() {
     if (data) {
       setLlamadoId(data.id);
       localStorage.setItem(STORAGE_LLAMADO, data.id);
+      logToSheets({
+        data: {
+          timestamp: new Date().toISOString(),
+          mesa: mesaId,
+          cliente,
+          mensaje: "Llamó al mozo",
+        },
+      }).catch(() => {});
     }
     await supabase.from("mesas").update({ estado: "ocupada" }).eq("id", mesaId);
   };
@@ -206,6 +215,9 @@ export function ChatPanel() {
       mesa_id: mesaKey,
       tipo: "cliente",
     });
+    logToSheets({
+      data: { timestamp: new Date().toISOString(), mesa: mesaKey, cliente: usuario, mensaje: trimmed },
+    }).catch(() => {});
 
     if (isUrgente && llamadoId) {
       await supabase.from("llamados").update({ prioridad: 1 }).eq("id", llamadoId);
