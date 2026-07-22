@@ -100,124 +100,67 @@ import tacosCarneAsset from "@/assets/carta/tacos-carne.png";
 const tacosCarne = tacosCarneAsset;
 import milanesaNapolitanaDosAsset from "@/assets/carta/milanesa-napolitana-dos.png";
 const milanesaNapolitanaDos = milanesaNapolitanaDosAsset;
-type Item = {
-  name: string;
-  description?: string;
-  price?: string;
-  priceWhole?: string;
-  priceHalf?: string;
-  photo?: string;
+import { MENU_CATEGORIES, type MenuCategory, type MenuItem } from "@/data/menu";
+
+type Item = MenuItem & { photo?: string };
+
+type CategoryData = Omit<MenuCategory, "items"> & { items: Item[] };
+
+// Fotos por nombre exacto del item (el texto/precio vive en src/data/menu.ts,
+// unica fuente de verdad compartida con el asistente de IA).
+const PHOTO_BY_NAME: Record<string, string> = {
+  "Classic Burger": classicBurger,
+  "Doble Burger": dobleBurger,
+  "Katrina Burger": katrinaBurger,
+  "Baño de Cheddar": banoCheddarV2,
+  "Bandeja de Hamburguesas": bandejaHamburguesas,
+  "Hamburguesas con Panes de Colores": hamburguesasPanesColores,
+  "Pizza Común": pizzaComun,
+  "Pizza Especial": pizzaEspecial,
+  "Pizza Doble Queso": pizzaDobleQueso,
+  "Pizza de Pollo": pizzaPollo,
+  "Pizza Napolitana": pizzaNapolitana,
+  "Pizza de Ternera": pizzaTernera,
+  "Pizza Mexicana": pizzaMexicana,
+  "Lomito Clásico": lomitoClasico,
+  "Lomito Katrina": lomitoKatrina,
+  "Sándwich de Milanesa": sandwichMilanesa,
+  "Milanesa Katrina": milanesaKatrina,
+  "Especial Katrina": especialKatrina,
+  "Lomo al Champiñón": lomoChampinon,
+  "Milanesa Napolitana para 2 personas": milanesaNapolitanaDos,
+  "Tacos del Norte": tacosCarne,
+  "Charly Gratinado": charlyGratinado,
+  "Nachos del Desierto": nachosDesierto,
+  "Picada Fría": picadaFriaV2,
+  "Picada Caliente": picadaCaliente,
+  "Hot Dog Callejero": hotdogCallejero,
+  "Hot Dog Frontera": hotdogFrontera,
+  "Hot Dog Encamisado": hotdogEncamisado,
+  "Papas con Cheddar & Bacon": papasCheddarBacon,
+  "Papas Clásicas": papasClasicas,
+  Salchipapas: salchipapas,
+  "Pollo Frito con Papas": polloFrito,
+  "Mini Cheesecake de Frutos Rojos": cheesecakeFrutosRojos,
+  "Mini Cheesecake de Maracuyá": cheesecakeMaracuya,
+  "Postre Oreo": postreOreo,
+  Tiramisú: tiramisu,
+  "Daiquiri de Frutilla": daiquiriFrutilla,
+  "Daiquiri en Rocas": daiquiriRocas,
+  "Frozen / Daiquiri": frozenDaiquiri,
+  "Sex on the Beach": sexOnTheBeach,
+  "Jarra de Gancia": jarraGancia,
+  "Trago con Menta": tragoMenta,
+  "Trago de Naranja": tragoNaranja,
+  "Trago Doble Colado": tragoDobleColado,
+  "Licor de Pepino": licorPepino,
+  "Limonada de Frutos Rojos": limonadaFrutosRojos,
 };
 
-type CategoryData = {
-  id: string;
-  label: string;
-  subtitle?: string;
-  priceMode?: "single" | "pizza";
-  kind?: "cocina" | "barra";
-  items: Item[];
-};
-
-const CATEGORIES: CategoryData[] = [
-  {
-    id: "hamburguesas",
-    label: "Hamburguesas",
-    subtitle: "Todas incluyen papas",
-    items: [
-      { name: "Classic Burger", price: "$9.000", description: "Lechuga, tomate, huevo, jamón, queso y papas.", photo: classicBurger },
-      { name: "Doble Burger", price: "$13.000", description: "Doble carne, lechuga, tomate, huevo y papas.", photo: dobleBurger },
-      { name: "Katrina Burger", price: "$16.000", description: "Doble carne 150gr, bacon, cheddar, salsa americana, huevo y papas.", photo: katrinaBurger },
-      { name: "Baño de Cheddar", price: "$3.000", description: "Adicional para cualquier hamburguesa.", photo: banoCheddarV2 },
-      { name: "Bandeja de Hamburguesas", price: "Consultar", description: "Para compartir: varias hamburguesas con papas al centro.", photo: bandejaHamburguesas },
-      { name: "Hamburguesas con Panes de Colores", price: "Consultar", description: "Panes artesanales de colores realizados por Carmelo.", photo: hamburguesasPanesColores },
-    ],
-  },
-  {
-    id: "pizzas",
-    label: "Pizzas",
-    subtitle: "Precios entera / media",
-    priceMode: "pizza",
-    items: [
-      { name: "Pizza Común", priceWhole: "$9.000", priceHalf: "$5.000", photo: pizzaComun },
-      { name: "Pizza Especial", priceWhole: "$11.000", priceHalf: "$6.000", photo: pizzaEspecial },
-      { name: "Pizza Doble Queso", priceWhole: "$11.000", priceHalf: "$6.000", photo: pizzaDobleQueso },
-      { name: "Pizza de Pollo", priceWhole: "$15.000", priceHalf: "$8.000", photo: pizzaPollo },
-      { name: "Pizza Napolitana", priceWhole: "$11.000", priceHalf: "$6.000", photo: pizzaNapolitana },
-      { name: "Pizza de Ternera", priceWhole: "$18.000", priceHalf: "$10.000", photo: pizzaTernera },
-      { name: "Pizza Mexicana", priceWhole: "$18.000", priceHalf: "$10.000", description: "Picante suave.", photo: pizzaMexicana },
-    ],
-  },
-  {
-    id: "sandwiches",
-    label: "Sándwiches",
-    subtitle: "Todos incluyen papas",
-    items: [
-      { name: "Lomito Clásico", price: "$10.000", description: "Lechuga, tomate, huevo, jamón, queso y papas.", photo: lomitoClasico },
-      { name: "Lomito Katrina", price: "$15.000", description: "Bacon, cheddar, salsa americana, huevo y papas.", photo: lomitoKatrina },
-      { name: "Sándwich de Milanesa", price: "$10.000", description: "Lechuga, tomate, huevo, jamón, queso y papas.", photo: sandwichMilanesa },
-      { name: "Milanesa Katrina", price: "$15.000", description: "Bacon, cheddar, salsa americana, huevo y papas.", photo: milanesaKatrina },
-      { name: "Especial Katrina", price: "$18.000", description: "Bife de chorizo, cebolla caramelizada, muzarella, morrón asado, mayonesa de ajo y papas.", photo: especialKatrina },
-      { name: "Lomo Katrina", price: "Consultar", description: "Nuestro lomo con la impronta Katrina." },
-      { name: "Lomo al Champiñón", price: "Consultar", description: "Con papas españolas y salsa de champiñones.", photo: lomoChampinon },
-      { name: "Milanesa Napolitana para 2 personas", price: "Consultar", description: "Milanesa napolitana para compartir entre dos.", photo: milanesaNapolitanaDos },
-    ],
-  },
-  {
-    id: "compartir",
-    label: "Para Compartir",
-    subtitle: "Noche mexicana y tablas",
-    items: [
-      { name: "Tacos del Norte", price: "$12.000 / $20.000", description: "Carne, pollo o mixtos. 3 tortillas (1p) · 6 tortillas (2p).", photo: tacosCarne },
-      { name: "Charly Gratinado", price: "$18.000 / $30.000", description: "Pan de miga, ternera, verdura, queso y papas. Chico / Grande.", photo: charlyGratinado },
-      { name: "Nachos del Desierto", price: "Consultar", description: "Con dip de guacamole y cheddar.", photo: nachosDesierto },
-      { name: "Picada Fría", price: "$20.000", description: "Salame, jamón, muzarella, cheddar, aceitunas, papas Lays y maní. 2p.", photo: picadaFriaV2 },
-      { name: "Picada Caliente", price: "$25.000 / $35.000", description: "Milanesa, aros de cebolla, papas, bastones de muzarella, crock, salchicha envuelta + 3 dips. 2p / 4p.", photo: picadaCaliente },
-    ],
-  },
-  {
-    id: "bajon",
-    label: "El Bajón",
-    subtitle: "Fritos & Hot Dogs",
-    items: [
-      { name: "Hot Dog Callejero", price: "$5.000", description: "Simple, como en la calle.", photo: hotdogCallejero },
-      { name: "Hot Dog Frontera", price: "$6.000", description: "Especial de la casa.", photo: hotdogFrontera },
-      { name: "Hot Dog Encamisado", price: "$8.000", description: "Envuelto en huevo con queso gratinado.", photo: hotdogEncamisado },
-      { name: "Papas con Cheddar & Bacon", price: "$9.000", photo: papasCheddarBacon },
-      { name: "Papas Clásicas", price: "$7.000", photo: papasClasicas },
-      { name: "Salchipapas", price: "$7.000", photo: salchipapas },
-      { name: "Pollo Frito con Papas", price: "$10.000", photo: polloFrito },
-    ],
-  },
-  {
-    id: "postres",
-    label: "Dulce Final",
-    subtitle: "Postres",
-    items: [
-      { name: "Mini Cheesecake de Frutos Rojos", price: "Consultar en mesa", photo: cheesecakeFrutosRojos },
-      { name: "Mini Cheesecake de Maracuyá", price: "Consultar en mesa", photo: cheesecakeMaracuya },
-      { name: "Postre Oreo", price: "Consultar en mesa", photo: postreOreo },
-      { name: "Tiramisú", price: "Consultar en mesa", photo: tiramisu },
-    ],
-  },
-  {
-    id: "barra",
-    label: "Barra",
-    subtitle: "Tragos y cervezas — precios a consultar",
-    kind: "barra",
-    items: [
-      { name: "Daiquiri de Frutilla", price: "Consultar", description: "O combinado con durazno. Sin alcohol.", photo: daiquiriFrutilla },
-      { name: "Daiquiri en Rocas", price: "Consultar", photo: daiquiriRocas },
-      { name: "Frozen / Daiquiri", price: "Consultar", photo: frozenDaiquiri },
-      { name: "Sex on the Beach", price: "Consultar", photo: sexOnTheBeach },
-      { name: "Jarra de Gancia", price: "Consultar", photo: jarraGancia },
-      { name: "Trago con Menta", price: "Consultar", photo: tragoMenta },
-      { name: "Trago de Naranja", price: "Consultar", photo: tragoNaranja },
-      { name: "Trago Doble Colado", price: "Consultar", photo: tragoDobleColado },
-      { name: "Licor de Pepino", price: "Consultar", photo: licorPepino },
-      { name: "Limonada de Frutos Rojos", price: "Consultar", photo: limonadaFrutosRojos },
-    ],
-  },
-];
+const CATEGORIES: CategoryData[] = MENU_CATEGORIES.map((cat) => ({
+  ...cat,
+  items: cat.items.map((item) => ({ ...item, photo: PHOTO_BY_NAME[item.name] })),
+}));
 
 export function MenuGrid() {
   const [index, setIndex] = useState(0);

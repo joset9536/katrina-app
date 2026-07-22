@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MessageCircle, Send, X } from "lucide-react";
+import { Bot, MessageCircle, Send, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { whatsappOrderUrl } from "@/lib/whatsapp";
+import { askKatrinaAi } from "@/lib/katrina-ai";
+
+type AiTurn = { role: "user" | "assistant"; content: string };
 
 type ChatMsg = {
   id: string;
@@ -28,6 +31,10 @@ const STORAGE_LLAMADO = "katrina_chat_llamado";
 
 export function ChatPanel() {
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"ai" | "mozo">("ai");
+  const [aiMessages, setAiMessages] = useState<AiTurn[]>([]);
+  const [aiInput, setAiInput] = useState("");
+  const [aiSending, setAiSending] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [usuario, setUsuario] = useState("");
@@ -136,7 +143,7 @@ export function ChatPanel() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, open]);
+  }, [messages, aiMessages, open]);
 
   const position = useMemo(() => {
     if (!llamadoId || !llamado || llamado.status !== "en_espera") return null;
@@ -193,6 +200,25 @@ export function ChatPanel() {
     await createLlamado(u, `mesa-${m}`);
   };
 
+  const askAi = async () => {
+    const question = aiInput.trim();
+    if (!question || aiSending) return;
+    setAiSending(true);
+    setAiInput("");
+    const history = aiMessages;
+    setAiMessages((prev) => [...prev, { role: "user", content: question }]);
+    try {
+      const res = await askKatrinaAi({ data: { question, mesa: mesa || undefined, history } });
+      setAiMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
+    } catch {
+      setAiMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "No me pude conectar ahora. Escribinos por WhatsApp mientras tanto." },
+      ]);
+    }
+    setAiSending(false);
+  };
+
   const statusLabel = () => {
     if (!llamado) return null;
     if (llamado.status === "atendido")
@@ -218,25 +244,92 @@ export function ChatPanel() {
 
       {open && (
         <div className="fixed bottom-44 right-4 z-50 flex h-[65vh] max-h-[560px] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-[#8B5CF6]/50 bg-[#0E0A1A]/95 shadow-[0_0_40px_rgba(139,92,246,0.35)] backdrop-blur-md animate-fade-in md:bottom-24 md:right-6 md:h-[70vh]">
-          <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-            <div>
+          <header className="border-b border-white/10">
+            <div className="flex items-center justify-between px-4 pt-3">
               <p className="text-sm font-semibold text-[#FF3D8A]">Katrina Chat</p>
-              {ready && (
-                <p className="text-[10px] uppercase tracking-widest text-white/50">
-                  Mesa {mesa} · {usuario}
-                </p>
-              )}
+              <button
+                onClick={() => setOpen(false)}
+                className="text-white/60 hover:text-white"
+                aria-label="Cerrar chat"
+              >
+                <X size={18} />
+              </button>
             </div>
-            <button
-              onClick={() => setOpen(false)}
-              className="text-white/60 hover:text-white"
-              aria-label="Cerrar chat"
-            >
-              <X size={18} />
-            </button>
+            <div className="flex gap-1 px-3 pb-2 pt-2">
+              <button
+                onClick={() => setMode("ai")}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                  mode === "ai" ? "bg-[#8B5CF6] text-white" : "text-white/50 hover:text-white"
+                }`}
+              >
+                <Bot size={14} /> Asistente
+              </button>
+              <button
+                onClick={() => setMode("mozo")}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                  mode === "mozo" ? "bg-[#FF3D8A] text-[#0E0A1A]" : "text-white/50 hover:text-white"
+                }`}
+              >
+                <MessageCircle size={14} /> Llamar mozo
+              </button>
+            </div>
+            {ready && mode === "mozo" && (
+              <p className="px-4 pb-2 text-[10px] uppercase tracking-widest text-white/50">
+                Mesa {mesa} · {usuario}
+              </p>
+            )}
           </header>
 
-          {!ready ? (
+          {mode === "ai" ? (
+            <>
+              <div className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
+                {aiMessages.length === 0 && (
+                  <p className="mt-8 text-center text-xs text-white/40">
+                    🤖 Preguntame por horarios, direccion o algun plato/trago de la carta.
+                  </p>
+                )}
+                {aiMessages.map((m, i) => (
+                  <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
+                    <span className="text-[10px] uppercase tracking-wider text-white/40">
+                      {m.role === "user" ? "Vos" : "Asistente"}
+                    </span>
+                    <div
+                      className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
+                        m.role === "user" ? "bg-[#FF3D8A] text-[#0E0A1A]" : "bg-[#8B5CF6]/90 text-white"
+                      }`}
+                    >
+                      {m.content}
+                    </div>
+                  </div>
+                ))}
+                {aiSending && <p className="text-xs text-white/40">Escribiendo…</p>}
+                <div ref={bottomRef} />
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  askAi();
+                }}
+                className="flex items-center gap-2 border-t border-white/10 px-3 py-3"
+              >
+                <input
+                  value={aiInput}
+                  onChange={(e) => setAiInput(e.target.value)}
+                  placeholder="Preguntame algo…"
+                  className="flex-1 rounded-full border border-white/15 bg-black/40 px-4 py-2 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none"
+                  maxLength={300}
+                />
+                <button
+                  type="submit"
+                  disabled={aiSending || !aiInput.trim()}
+                  aria-label="Preguntar"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#8B5CF6] text-white transition hover:bg-[#a078f7] disabled:opacity-40"
+                >
+                  <Send size={16} />
+                </button>
+              </form>
+            </>
+          ) : !ready ? (
             <form onSubmit={saveIdentity} className="flex flex-1 flex-col justify-center gap-3 px-5">
               <p className="text-xs text-white/70">
                 Contanos tu nombre y en qué mesa estás para llamar al staff.
