@@ -152,6 +152,24 @@ export function ChatPanel() {
   }, [queue, llamadoId, llamado]);
 
   const createLlamado = async (cliente: string, mesaId: string) => {
+    // Si otro celular de la MISMA mesa ya esta esperando o siendo atendido,
+    // nos sumamos a ese llamado en vez de crear uno duplicado en la cola
+    // (una mesa con 5 amigos no son 5 llamados distintos).
+    const { data: existing } = await supabase
+      .from("llamados")
+      .select("*")
+      .eq("mesa_id", mesaId)
+      .in("status", ["en_espera", "atendido"])
+      .order("timestamp", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (existing) {
+      setLlamadoId(existing.id);
+      localStorage.setItem(STORAGE_LLAMADO, existing.id);
+      setLlamado(existing as Llamado);
+      return;
+    }
+
     const { data } = await supabase
       .from("llamados")
       .insert({ mesa_id: mesaId, cliente_nombre: cliente, status: "en_espera", prioridad: 0 })
