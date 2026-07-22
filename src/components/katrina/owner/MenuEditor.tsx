@@ -10,16 +10,24 @@ const CATEGORY_ORDER = MENU_CATEGORIES.map((c) => c.id);
 
 export function MenuEditor() {
   const [rows, setRows] = useState<MenuItemRow[] | null>(null);
+  const [tableMissing, setTableMissing] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [seedError, setSeedError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
 
   const load = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("menu_items")
       .select("*")
       .order("category_id")
       .order("sort_order");
+    if (error) {
+      setTableMissing(true);
+      setRows([]);
+      return;
+    }
+    setTableMissing(false);
     setRows((data as MenuItemRow[]) || []);
   };
 
@@ -36,8 +44,14 @@ export function MenuEditor() {
 
   const seed = async () => {
     setSeeding(true);
-    await supabase.from("menu_items").insert(buildSeedRows());
+    setSeedError(null);
+    const { error } = await supabase.from("menu_items").insert(buildSeedRows());
     setSeeding(false);
+    if (error) {
+      setSeedError(error.message);
+      return;
+    }
+    load();
   };
 
   const updateRow = (id: string, patch: Partial<MenuItemRow>) => {
@@ -69,6 +83,20 @@ export function MenuEditor() {
     );
   }
 
+  if (tableMissing) {
+    return (
+      <section className="rounded-xl border border-red-500/30 bg-black/40 p-4">
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-widest text-red-400">
+          Editor de carta — falta un paso técnico
+        </h2>
+        <p className="text-xs text-white/60">
+          Todavía no se creó la tabla en la base de datos. Pedile a quien te ayuda con la web que corra
+          la migración <code className="rounded bg-white/10 px-1">menu_items</code> en Supabase.
+        </p>
+      </section>
+    );
+  }
+
   if (rows.length === 0) {
     return (
       <section className="rounded-xl border border-white/10 bg-black/40 p-4">
@@ -79,6 +107,7 @@ export function MenuEditor() {
           Todavía no hay una carta cargada acá. Apretá el botón para traer la carta actual del sitio y
           empezar a editarla — no se pierde nada, solo la copia por primera vez.
         </p>
+        {seedError && <p className="mb-2 text-xs text-red-400">Error: {seedError}</p>}
         <button
           onClick={seed}
           disabled={seeding}
