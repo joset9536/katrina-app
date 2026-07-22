@@ -379,7 +379,9 @@ function MenuCard({
             />
           </div>
         ) : (
-          <div className="menu-photo aspect-[4/3] w-full" aria-hidden />
+          <div className="menu-photo flex aspect-[4/3] w-full items-center justify-center text-xs uppercase tracking-[0.3em] text-white/40">
+            Foto pendiente
+          </div>
         )}
         <div className="flex flex-1 flex-col p-5">
           <div className="flex items-start justify-between gap-4">

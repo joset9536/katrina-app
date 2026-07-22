@@ -96,10 +96,10 @@ export const MENU_CATEGORIES: MenuCategory[] = [
     label: "Dulce Final",
     subtitle: "Postres",
     items: [
-      { name: "Mini Cheesecake de Frutos Rojos", price: "Consultar en mesa" },
-      { name: "Mini Cheesecake de Maracuyá", price: "Consultar en mesa" },
-      { name: "Postre Oreo", price: "Consultar en mesa" },
-      { name: "Tiramisú", price: "Consultar en mesa" },
+      { name: "Mini Cheesecake de Frutos Rojos", price: "Consultar" },
+      { name: "Mini Cheesecake de Maracuyá", price: "Consultar" },
+      { name: "Postre Oreo", price: "Consultar" },
+      { name: "Tiramisú", price: "Consultar" },
     ],
   },
   {
