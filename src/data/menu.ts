@@ -1,9 +1,12 @@
+import { supabase } from "@/integrations/supabase/client";
+
 export type MenuItem = {
   name: string;
   description?: string;
   price?: string;
   priceWhole?: string;
   priceHalf?: string;
+  photoKey?: string;
 };
 
 export type MenuCategory = {
@@ -126,3 +129,74 @@ export const KATRINA_INFO = {
   whatsapp: "5493878631310",
   instagram: "https://instagram.com/katrina.restobar",
 };
+
+export type MenuItemRow = {
+  id: string;
+  category_id: string;
+  photo_key: string;
+  name: string;
+  description: string | null;
+  price: string | null;
+  price_whole: string | null;
+  price_half: string | null;
+  sort_order: number;
+};
+
+/**
+ * Trae los items editables desde Supabase (tabla `menu_items`, la edita la
+ * dueña desde /owner). Si la tabla todavia no existe o esta vacia, devuelve
+ * null y el que llama tiene que usar MENU_CATEGORIES (texto fijo) como
+ * respaldo — asi el sitio nunca se rompe por esto.
+ */
+export async function fetchLiveMenuByCategory(): Promise<Record<string, MenuItem[]> | null> {
+  try {
+    const { data, error } = await supabase
+      .from("menu_items")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    if (error || !data || data.length === 0) return null;
+
+    const byCategory: Record<string, MenuItem[]> = {};
+    for (const row of data as MenuItemRow[]) {
+      const item: MenuItem = {
+        name: row.name,
+        description: row.description ?? undefined,
+        price: row.price ?? undefined,
+        priceWhole: row.price_whole ?? undefined,
+        priceHalf: row.price_half ?? undefined,
+        photoKey: row.photo_key,
+      };
+      (byCategory[row.category_id] ??= []).push(item);
+    }
+    return byCategory;
+  } catch {
+    return null;
+  }
+}
+
+/** Mezcla los items en vivo (si hay) sobre las categorias fijas (label/subtitle/kind). */
+export function mergeLiveMenu(
+  liveByCategory: Record<string, MenuItem[]> | null,
+): MenuCategory[] {
+  if (!liveByCategory) return MENU_CATEGORIES;
+  return MENU_CATEGORIES.map((cat) => ({
+    ...cat,
+    items: liveByCategory[cat.id]?.length ? liveByCategory[cat.id] : cat.items,
+  }));
+}
+
+/** Semilla inicial: vuelca MENU_CATEGORIES a filas de menu_items (una sola vez). */
+export function buildSeedRows() {
+  return MENU_CATEGORIES.flatMap((cat) =>
+    cat.items.map((item, i) => ({
+      category_id: cat.id,
+      photo_key: item.name,
+      name: item.name,
+      description: item.description ?? null,
+      price: item.price ?? null,
+      price_whole: item.priceWhole ?? null,
+      price_half: item.priceHalf ?? null,
+      sort_order: i,
+    })),
+  );
+}

@@ -6,7 +6,7 @@ import { MapaMesasRef } from "@/components/katrina/staff/MapaMesasRef";
 import { PinGate } from "@/components/katrina/PinGate";
 import { supabase } from "@/integrations/supabase/client";
 
-const STAFF_PIN = import.meta.env.VITE_STAFF_PIN || process.env.STAFF_PIN || "katrina-mozos";
+const STAFF_PIN = import.meta.env.VITE_STAFF_PIN || process.env.STAFF_PIN || "1234";
 
 export const Route = createFileRoute("/staff")({
   head: () => ({

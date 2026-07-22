@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { PinGate } from "@/components/katrina/PinGate";
+import { MenuEditor } from "@/components/katrina/owner/MenuEditor";
 
-const OWNER_PIN = import.meta.env.VITE_OWNER_PIN || process.env.OWNER_PIN || "katrina-gerencia";
+const OWNER_PIN = import.meta.env.VITE_OWNER_PIN || process.env.OWNER_PIN || "5678";
 
 export const Route = createFileRoute("/owner")({
   head: () => ({
@@ -124,20 +125,23 @@ function OwnerPage() {
         <h1 className="text-lg font-semibold text-[#FF3D8A]">Dashboard</h1>
         <p className="text-[11px] text-white/50">Actualiza en tiempo real</p>
       </header>
-      <main className="mx-auto grid max-w-5xl gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
-        {!m ? (
-          <p className="text-sm text-white/50">Cargando…</p>
-        ) : (
-          cards.map((c) => (
-            <div
-              key={c.label}
-              className="rounded-xl border border-white/10 bg-black/40 p-5"
-            >
-              <p className="text-[10px] uppercase tracking-widest text-white/50">{c.label}</p>
-              <p className={`mt-2 text-3xl font-bold ${c.accent}`}>{c.value}</p>
-            </div>
-          ))
-        )}
+      <main className="mx-auto max-w-5xl space-y-6 p-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {!m ? (
+            <p className="text-sm text-white/50">Cargando…</p>
+          ) : (
+            cards.map((c) => (
+              <div
+                key={c.label}
+                className="rounded-xl border border-white/10 bg-black/40 p-5"
+              >
+                <p className="text-[10px] uppercase tracking-widest text-white/50">{c.label}</p>
+                <p className={`mt-2 text-3xl font-bold ${c.accent}`}>{c.value}</p>
+              </div>
+            ))
+          )}
+        </div>
+        <MenuEditor />
       </main>
     </div>
   );

@@ -1,8 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
-import { MENU_CATEGORIES, KATRINA_INFO } from "@/data/menu";
+import { MENU_CATEGORIES, KATRINA_INFO, fetchLiveMenuByCategory, mergeLiveMenu } from "@/data/menu";
 
-function formatMenuForPrompt(): string {
-  return MENU_CATEGORIES.map((cat) => {
+async function formatMenuForPrompt(): Promise<string> {
+  const live = await fetchLiveMenuByCategory();
+  const categories = mergeLiveMenu(live);
+  return categories.map((cat) => {
     const items = cat.items
       .map((item) => {
         const price =
@@ -15,7 +17,8 @@ function formatMenuForPrompt(): string {
   }).join("\n\n");
 }
 
-function systemPrompt(mesa?: string): string {
+async function systemPrompt(mesa?: string): Promise<string> {
+  const menu = await formatMenuForPrompt();
   return `Sos el asistente virtual de Katrina, un restobar en ${KATRINA_INFO.direccion}.
 Horario: ${KATRINA_INFO.horario}.
 WhatsApp para pedidos y consultas puntuales: +${KATRINA_INFO.whatsapp}.
@@ -23,7 +26,7 @@ ${mesa ? `El cliente que te escribe está en la Mesa ${mesa}.` : ""}
 
 Esta es la carta completa y real del local (nunca inventes platos, precios ni tragos que no estén acá):
 
-${formatMenuForPrompt()}
+${menu}
 
 Reglas:
 - Respondé corto, en español rioplatense/salteño informal, como un mozo copado.
@@ -47,7 +50,7 @@ export const askKatrinaAi = createServerFn({ method: "POST" })
     }
 
     const messages = [
-      { role: "system", content: systemPrompt(data.mesa) },
+      { role: "system", content: await systemPrompt(data.mesa) },
       ...(data.history ?? []).slice(-6),
       { role: "user", content: data.question },
     ];

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { useInView } from "@/hooks/use-in-view";
 import { whatsappItemUrl } from "@/lib/whatsapp";
@@ -100,7 +100,7 @@ import tacosCarneAsset from "@/assets/carta/tacos-carne.png";
 const tacosCarne = tacosCarneAsset;
 import milanesaNapolitanaDosAsset from "@/assets/carta/milanesa-napolitana-dos.png";
 const milanesaNapolitanaDos = milanesaNapolitanaDosAsset;
-import { MENU_CATEGORIES, type MenuCategory, type MenuItem } from "@/data/menu";
+import { MENU_CATEGORIES, fetchLiveMenuByCategory, type MenuCategory, type MenuItem } from "@/data/menu";
 
 type Item = MenuItem & { photo?: string };
 
@@ -157,18 +157,43 @@ const PHOTO_BY_NAME: Record<string, string> = {
   "Limonada de Frutos Rojos": limonadaFrutosRojos,
 };
 
-const CATEGORIES: CategoryData[] = MENU_CATEGORIES.map((cat) => ({
-  ...cat,
-  items: cat.items.map((item) => ({ ...item, photo: PHOTO_BY_NAME[item.name] })),
-}));
+function withPhotos(categories: MenuCategory[]): CategoryData[] {
+  return categories.map((cat) => ({
+    ...cat,
+    items: cat.items.map((item) => ({
+      ...item,
+      photo: PHOTO_BY_NAME[item.photoKey ?? item.name],
+    })),
+  }));
+}
+
+const BASE_CATEGORIES: CategoryData[] = withPhotos(MENU_CATEGORIES);
 
 export function MenuGrid() {
   const [index, setIndex] = useState(0);
+  const [categories, setCategories] = useState<CategoryData[]>(BASE_CATEGORIES);
   const { ref, visible } = useInView<HTMLDivElement>();
   const tabsRef = useRef<HTMLDivElement | null>(null);
   const activeRef = useRef<HTMLDivElement | null>(null);
 
-  const active = CATEGORIES[index];
+  // La dueña puede editar precios/nombres desde /owner (tabla menu_items en
+  // Supabase). Si no hay nada cargado ahi todavia, se queda con el texto fijo.
+  useEffect(() => {
+    let mounted = true;
+    fetchLiveMenuByCategory().then((live) => {
+      if (!mounted || !live) return;
+      const merged = MENU_CATEGORIES.map((cat) => ({
+        ...cat,
+        items: live[cat.id]?.length ? live[cat.id] : cat.items,
+      }));
+      setCategories(withPhotos(merged));
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const active = categories[index];
 
   const selectCategory = (i: number) => {
     setIndex(i);
@@ -209,7 +234,7 @@ export function MenuGrid() {
           style={{ touchAction: "pan-x", overscrollBehaviorX: "contain" }}
           className="sticky top-14 z-30 mb-8 -mx-6 flex flex-nowrap justify-start gap-2 overflow-x-auto border-b border-white/5 bg-[#0b0713]/85 px-6 py-3 backdrop-blur-md md:static md:mx-0 md:flex-wrap md:justify-center md:overflow-visible md:border-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none"
         >
-          {CATEGORIES.map((cat, i) => {
+          {categories.map((cat, i) => {
             const isActive = i === index;
             return (
               <button
