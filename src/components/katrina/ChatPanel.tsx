@@ -50,9 +50,20 @@ export function ChatPanel() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const mesaParam = params.get("mesa") || "";
+    const storedMesa = localStorage.getItem(STORAGE_MESA) || "";
     const u = localStorage.getItem(STORAGE_USER) || "";
-    const m = mesaParam || localStorage.getItem(STORAGE_MESA) || "";
-    const l = localStorage.getItem(STORAGE_LLAMADO);
+    const m = mesaParam || storedMesa;
+
+    // Si el cliente escanea el QR de OTRA mesa (se cambio de lugar, o es el
+    // QR de un amigo), no arrastramos el llamado viejo de la mesa anterior —
+    // sino se mezcla el estado de una mesa con el chat de otra.
+    const mesaChanged = Boolean(mesaParam && storedMesa && mesaParam !== storedMesa);
+    if (mesaChanged) {
+      localStorage.removeItem(STORAGE_LLAMADO);
+      localStorage.setItem(STORAGE_MESA, mesaParam);
+    }
+    const l = mesaChanged ? null : localStorage.getItem(STORAGE_LLAMADO);
+
     setUsuario(u);
     setMesa(m);
     setLlamadoId(l);
