@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { useInView } from "@/hooks/use-in-view";
 import { requestOrder } from "@/lib/order-bridge";
+import { MenuSwiper, type FlatMenuItem } from "./MenuSwiper";
 
 
 import classicBurgerAsset from "@/assets/carta/classic-burger.jpg";
@@ -172,9 +173,24 @@ const BASE_CATEGORIES: CategoryData[] = withPhotos(MENU_CATEGORIES);
 export function MenuGrid() {
   const [index, setIndex] = useState(0);
   const [categories, setCategories] = useState<CategoryData[]>(BASE_CATEGORIES);
+  const [swipePos, setSwipePos] = useState(0);
   const { ref, visible } = useInView<HTMLDivElement>();
   const tabsRef = useRef<HTMLDivElement | null>(null);
   const activeRef = useRef<HTMLDivElement | null>(null);
+
+  // Todos los platos en una sola lista, en orden, para el modo swipe mobile.
+  const flat = useMemo<FlatMenuItem[]>(
+    () =>
+      categories.flatMap((cat, ci) =>
+        cat.items.map((item) => ({
+          ...item,
+          categoryIndex: ci,
+          categoryLabel: cat.label,
+          pizzaMode: cat.priceMode === "pizza",
+        })),
+      ),
+    [categories],
+  );
 
   // La dueña puede editar precios/nombres desde /owner (tabla menu_items en
   // Supabase). Si no hay nada cargado ahi todavia, se queda con el texto fijo.
@@ -197,6 +213,10 @@ export function MenuGrid() {
 
   const selectCategory = (i: number) => {
     setIndex(i);
+    // Al tocar una pestaña, el modo swipe mobile salta al primer plato de esa categoria.
+    const firstInCat = flat.findIndex((it) => it.categoryIndex === i);
+    if (firstInCat >= 0) setSwipePos(firstInCat);
+
     const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
     const offset = isMobile ? 120 : 88;
     window.setTimeout(() => {
@@ -205,6 +225,15 @@ export function MenuGrid() {
       const y = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top: y, behavior: "smooth" });
     }, 60);
+  };
+
+  // El swipe mobile puede cruzar de una categoria a otra deslizando — cuando
+  // eso pasa, sincronizamos la pestaña activa arriba sin volver a saltar el
+  // swipe (por eso esto no llama a selectCategory).
+  const handleSwipePos = (next: number) => {
+    setSwipePos(next);
+    const newCat = flat[next]?.categoryIndex;
+    if (newCat !== undefined && newCat !== index) setIndex(newCat);
   };
 
 
@@ -268,7 +297,10 @@ export function MenuGrid() {
           <div className="mb-6 text-center">
             <p className="text-sm text-white/60">{active.subtitle}</p>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
+
+          <MenuSwiper flat={flat} pos={swipePos} onPosChange={handleSwipePos} />
+
+          <div className="hidden gap-3 sm:gap-5 md:grid md:grid-cols-2 lg:grid-cols-3">
             {active.items.map((item, i) => (
               <MenuCard
                 key={`${active.id}-${item.name}`}
@@ -295,7 +327,6 @@ function MenuCard({
   index: number;
 }) {
   const { ref, visible } = useInView<HTMLDivElement>();
-  const [expanded, setExpanded] = useState(false);
   const orderText = `Quiero pedir: ${item.name}${
     item.price ?? item.priceWhole ? ` (${item.price ?? item.priceWhole})` : ""
   }`;
@@ -319,59 +350,7 @@ function MenuCard({
       className={`menu-card fade-up overflow-hidden ${visible ? "is-visible" : ""}`}
       style={{ transitionDelay: `${index * 40}ms` }}
     >
-      {/* Mobile compact row (tap to expand) */}
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        aria-expanded={expanded}
-        className="flex w-full items-center gap-3 p-3 text-left md:hidden"
-      >
-        {item.photo ? (
-          <img
-            src={item.photo}
-            alt={item.name}
-            loading="lazy"
-            className="h-16 w-16 shrink-0 rounded-lg object-cover"
-          />
-        ) : (
-          <div className="menu-photo h-16 w-16 shrink-0 rounded-lg" aria-hidden />
-        )}
-        <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-          <h3 className="min-w-0 truncate font-display text-base leading-tight">{item.name}</h3>
-          {priceNode}
-        </div>
-      </button>
-      {expanded && (
-        <div className="border-t border-white/5 px-4 pb-4 pt-3 md:hidden">
-          {item.photo && (
-            <div className="aspect-[4/3] w-full overflow-hidden rounded-lg mb-3">
-              <img src={item.photo} alt={item.name} className="h-full w-full object-cover" />
-            </div>
-          )}
-          {item.description && (
-            <p className="text-sm leading-relaxed text-white/70">{item.description}</p>
-          )}
-          {pizzaMode && (
-            <div className="mt-3 grid grid-cols-2 gap-3 border-t border-white/10 pt-3">
-              <PizzaPrice label="Entera" value={item.priceWhole} />
-              <PizzaPrice label="Media" value={item.priceHalf} />
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              requestOrder(orderText);
-            }}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-[#FF3D8A] px-4 py-2 text-xs font-semibold text-[#0E0A1A]"
-          >
-            <MessageCircle size={14} /> Pedir este
-          </button>
-        </div>
-      )}
-
-      {/* Desktop / tablet full card */}
-      <div className="hidden h-full flex-col md:flex">
+      <div className="flex h-full flex-col">
         {item.photo ? (
           <div className="aspect-[4/3] w-full overflow-hidden">
             <img
