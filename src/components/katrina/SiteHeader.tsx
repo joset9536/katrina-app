@@ -3,11 +3,10 @@ import { Menu, X } from "lucide-react";
 import { KatrinaMark } from "./KatrinaMark";
 
 const NAV = [
-  { href: "#identidad", label: "Identidad" },
-  { href: "#eventos", label: "Eventos" },
   { href: "#carta", label: "Carta" },
-  { href: "#fidelizacion", label: "Fidelización" },
-  { href: "#comunidad", label: "Comunidad" },
+  { href: "#eventos", label: "Eventos" },
+  { href: "#identidad", label: "Identidad" },
+  { href: "#contacto", label: "Contacto" },
 ];
 
 export function SiteHeader() {

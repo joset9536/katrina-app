@@ -4,14 +4,11 @@ import { Hero } from "@/components/katrina/Hero";
 import { Identidad } from "@/components/katrina/Identidad";
 import { Eventos } from "@/components/katrina/Eventos";
 import { MenuGrid } from "@/components/katrina/MenuGrid";
-import { Fidelizacion } from "@/components/katrina/Fidelizacion";
-import { Comunidad } from "@/components/katrina/Comunidad";
 import { SiteFooter } from "@/components/katrina/SiteFooter";
 import { StarField } from "@/components/katrina/StarField";
 import { FloatingSigns } from "@/components/katrina/FloatingSigns";
 import { ChatPanel } from "@/components/katrina/ChatPanel";
 import { MobileBottomBar } from "@/components/katrina/MobileBottomBar";
-
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -25,18 +22,15 @@ function Index() {
         <SiteHeader />
         <main>
           <Hero />
-          <Identidad />
-          <Eventos />
           <MenuGrid />
-          <Fidelizacion />
-          <Comunidad />
+          <Eventos />
+          <Identidad />
         </main>
         <SiteFooter />
       </div>
       <FloatingSigns />
       <ChatPanel />
       <MobileBottomBar />
-
     </div>
   );
 }
