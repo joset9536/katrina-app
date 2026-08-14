@@ -67,7 +67,7 @@ export function EmpleadosPanel() {
     <section className="katrina-frame rounded-xl border border-[#C4A35A]/25 bg-black/45 p-4">
       <h2 className="text-sm font-semibold uppercase tracking-widest text-[#E8B923]">Empleados</h2>
       <p className="mt-1 text-xs text-white/50">
-        Brenda crea el nombre y la clave. El mozo entra en /salon con eso, desde su celular, y ve las mesas.
+        Brenda crea el nombre y la clave. Queda en la hoja Katrina. El mozo entra en /salon desde su celular.
       </p>
       {error && <p className="mt-2 text-xs text-red-300">{error}</p>}
       <form onSubmit={crear} className="mt-3 grid gap-2 sm:grid-cols-[1fr_1fr_auto]">

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { playCallBeep } from "@/lib/notify";
-import { atenderLlamado, listarCola } from "@/lib/salon-bus";
+import { atenderLlamado, listarCola } from "@/lib/salon-live";
 
 type Llamado = {
   id: string;

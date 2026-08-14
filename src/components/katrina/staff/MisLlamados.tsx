@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { isPedidoMessage, parsePedidoFromChat } from "@/lib/pedido";
 import { cartLineLabel, type CartLine } from "@/lib/cart";
-import { enviarChat, listarChat, listarMisLlamados, resolverLlamado } from "@/lib/salon-bus";
+import { enviarChat, listarChat, listarMisLlamados, resolverLlamado } from "@/lib/salon-live";
 
 type Llamado = {
   id: string;
@@ -79,7 +79,7 @@ export function MisLlamados({ staffNombre }: { staffNombre: string }) {
   const resolver = async (l: Llamado) => {
     if (busyId) return;
     setBusyId(l.id);
-    const res = await resolverLlamado({ data: { id: l.id } });
+    const res = await resolverLlamado({ data: { id: l.id, mesaId: l.mesa_id } });
     setBusyId(null);
     if (!res.ok) {
       toast.error(res.error || "No se pudo marcar como atendido.");

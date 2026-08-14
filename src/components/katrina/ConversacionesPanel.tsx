@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { listarConversaciones, type ChatRow } from "@/lib/salon-bus";
+import { listarConversaciones } from "@/lib/salon-live";
+import type { ChatRow } from "@/lib/salon-bus";
 
 export function ConversacionesPanel() {
   const [rows, setRows] = useState<ChatRow[]>([]);

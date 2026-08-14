@@ -11,7 +11,7 @@ import {
   STORAGE_LLAMADO,
 } from "@/lib/mesa";
 import { ensureLlamado, type LlamadoRow } from "@/lib/pedido";
-import { enviarChat, getLlamado, listarChat, listarCola } from "@/lib/salon-bus";
+import { enviarChat, getLlamado, listarChat, listarCola } from "@/lib/salon-live";
 
 type ChatMsg = {
   id: string;

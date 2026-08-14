@@ -91,28 +91,33 @@ function SalonPage() {
     return () => clearInterval(t);
   }, [turnoId]);
 
-  const afterLogin = async (s: SalonSesion) => {
+  const afterLogin = (s: SalonSesion) => {
     writeSesion(s);
     setSesion(s);
-    const id = await abrirTurno(s.nombre);
-    if (id) {
+    setTab(s.rol === "gerente" ? "gerencia" : "mozo");
+    void abrirTurno(s.nombre).then((id) => {
+      if (!id) return;
       localStorage.setItem(STORAGE_TURNO, id);
       setTurnoId(id);
-    }
-    setTab(s.rol === "gerente" ? "gerencia" : "mozo");
+    });
   };
 
   const entrar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
-    const res = await entrarConClave(nombre, clave);
-    setBusy(false);
-    if (res.error || !res.sesion) {
-      toast.error(res.error || "No se pudo entrar. Tocá de nuevo.");
-      return;
+    try {
+      const res = await entrarConClave(nombre, clave);
+      if (res.error || !res.sesion) {
+        toast.error(res.error || "Clave incorrecta.");
+        return;
+      }
+      afterLogin(res.sesion);
+    } catch {
+      toast.error("No se pudo entrar. Tocá de nuevo.");
+    } finally {
+      setBusy(false);
     }
-    afterLogin(res.sesion);
   };
 
   const salir = async () => {

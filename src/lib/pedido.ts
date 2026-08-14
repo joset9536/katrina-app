@@ -1,7 +1,7 @@
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { formatPedidoText, type CartLine } from "./cart";
 import { logToSheets } from "./sheets-log";
-import { llamarMozo, enviarChat } from "./salon-bus";
+import { enviarChat, llamarMozo } from "./salon-live";
 
 export function isNetworkFailure(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err ?? "");
