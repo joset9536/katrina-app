@@ -4,7 +4,7 @@ import { KatrinaMark } from "./KatrinaMark";
 
 const NAV = [
   { href: "#carta", label: "Carta" },
-  { href: "#eventos", label: "Eventos" },
+  { href: "#eventos", label: "Noches" },
   { href: "#identidad", label: "Identidad" },
   { href: "#contacto", label: "Contacto" },
 ];

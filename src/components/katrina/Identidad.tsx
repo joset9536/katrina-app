@@ -3,18 +3,32 @@ import { useInView } from "@/hooks/use-in-view";
 import { MapPin } from "lucide-react";
 import { NeonButton } from "./NeonButton";
 
-import patio01Asset from "@/assets/patio/patio-01.png";
-import patio02Asset from "@/assets/patio/patio-02.png";
-import patio03Asset from "@/assets/patio/patio-03.png";
-import patio04Asset from "@/assets/patio/patio-04.png";
+import salonMesas from "@/assets/local/salon-mesas.jpg";
+import barraNoche from "@/assets/local/barra-noche.jpg";
+import genteBrindis from "@/assets/local/gente-brindis.jpg";
+import musicaVivo from "@/assets/local/musica-vivo.jpg";
+import picadaMesa from "@/assets/local/picada-mesa.jpg";
+import qrMesa from "@/assets/local/qr-mesa.jpg";
+import detalleVasos from "@/assets/local/detalle-vasos.jpg";
+import patio01 from "@/assets/patio/patio-01.png";
+import patio02 from "@/assets/patio/patio-02.png";
+import patio03 from "@/assets/patio/patio-03.png";
+import patio04 from "@/assets/patio/patio-04.png";
 
 const BORDER_COLORS = ["#FF3D8A", "#E8B923", "#8B5CF6", "#74ACDF"];
 
 const PHOTOS = [
-  { src: patio01Asset, label: "Patio" },
-  { src: patio02Asset, label: "Ambiente" },
-  { src: patio03Asset, label: "Segundo piso" },
-  { src: patio04Asset, label: "Entrada" },
+  { src: salonMesas, label: "Salón" },
+  { src: barraNoche, label: "Barra" },
+  { src: genteBrindis, label: "La mesa" },
+  { src: picadaMesa, label: "Picada" },
+  { src: musicaVivo, label: "Música" },
+  { src: qrMesa, label: "Pedido por QR" },
+  { src: detalleVasos, label: "Tragos" },
+  { src: patio01, label: "Patio" },
+  { src: patio02, label: "Ambiente" },
+  { src: patio03, label: "Segundo piso" },
+  { src: patio04, label: "Entrada" },
 ];
 
 const MAPS_URL =
@@ -40,8 +54,7 @@ export function Identidad() {
         ? (el.firstElementChild as HTMLElement).offsetWidth + 16
         : 320;
       const maxScroll = el.scrollWidth - el.clientWidth - 4;
-      const next =
-        el.scrollLeft + tileW >= maxScroll ? 0 : el.scrollLeft + tileW;
+      const next = el.scrollLeft + tileW >= maxScroll ? 0 : el.scrollLeft + tileW;
       el.scrollTo({ left: next, behavior: "smooth" });
     }, 4000);
     return () => {
@@ -54,31 +67,20 @@ export function Identidad() {
   return (
     <section id="identidad" className="relative py-16 md:py-20">
       <div className="mx-auto max-w-6xl px-6">
-        <div
-          ref={ref}
-          className={`fade-up mb-8 text-center ${visible ? "is-visible" : ""}`}
-        >
-          <span className="text-xs uppercase tracking-[0.4em] text-white/50">
-            El lugar
-          </span>
+        <div ref={ref} className={`fade-up mb-8 text-center ${visible ? "is-visible" : ""}`}>
+          <span className="text-xs uppercase tracking-[0.4em] text-white/50">El lugar</span>
           <h2 className="mt-3 font-display text-3xl md:text-4xl">
             Egüés 517 · <span className="text-neon-gradient">Orán</span>
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-sm text-white/65">
-            Coctelería, cocina y buena música. El punto de encuentro nocturno de la ciudad.
+            Restobar de noche: hamburguesas, pizzas, picadas y tragos. Pedí desde la mesa con el QR.
           </p>
-
           <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <div className="flex items-center gap-2 text-sm text-white/80">
               <MapPin size={16} className="text-white/60" />
               Egüés 517, Orán, Salta
             </div>
-            <NeonButton
-              href={MAPS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="ghost"
-            >
+            <NeonButton href={MAPS_URL} target="_blank" rel="noopener noreferrer" variant="ghost">
               Cómo llegar
             </NeonButton>
           </div>
@@ -89,7 +91,7 @@ export function Identidad() {
             const color = BORDER_COLORS[i % BORDER_COLORS.length];
             return (
               <div
-                key={p.label}
+                key={`${p.label}-${i}`}
                 className="gallery-tile shrink-0 overflow-hidden rounded-xl"
                 style={{
                   width: "min(72vw, 280px)",
@@ -97,12 +99,7 @@ export function Identidad() {
                   boxShadow: `0 0 18px color-mix(in oklab, ${color} 45%, transparent)`,
                 }}
               >
-                <img
-                  src={p.src}
-                  alt={p.label}
-                  loading="lazy"
-                  className="h-48 w-full object-cover"
-                />
+                <img src={p.src} alt={p.label} loading="lazy" className="h-48 w-full object-cover" />
                 <div className="px-3 py-2 text-center text-xs uppercase tracking-[0.2em] text-white/70">
                   {p.label}
                 </div>

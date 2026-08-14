@@ -70,6 +70,8 @@ import hamburguesasPanesColoresAsset from "@/assets/carta/hamburguesas-panes-col
 const hamburguesasPanesColores = hamburguesasPanesColoresAsset;
 import lomoChampinonAsset from "@/assets/carta/lomo-champinon.jpg";
 const lomoChampinon = lomoChampinonAsset;
+import lomoKatrinaAsset from "@/assets/carta/lomo-katrina.jpg";
+const lomoKatrina = lomoKatrinaAsset;
 import licorPepinoAsset from "@/assets/barra/licor-pepino.jpg";
 const licorPepino = licorPepinoAsset;
 import limonadaFrutosRojosAsset from "@/assets/barra/limonada-frutos-rojos.jpg";
@@ -125,6 +127,7 @@ const PHOTO_BY_NAME: Record<string, string> = {
   "Sándwich de Milanesa": sandwichMilanesa,
   "Milanesa Katrina": milanesaKatrina,
   "Especial Katrina": especialKatrina,
+  "Lomo Katrina": lomoKatrina,
   "Lomo al Champiñón": lomoChampinon,
   "Milanesa Napolitana para 2 personas": milanesaNapolitanaDos,
   "Tacos del Norte": tacosCarne,

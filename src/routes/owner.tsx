@@ -128,16 +128,26 @@ function OwnerPage() {
           <h1 className="text-lg font-semibold text-[#FF3D8A]">Dashboard</h1>
           <p className="text-[11px] text-white/50">Actualiza en tiempo real</p>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            localStorage.removeItem("katrina_owner_pin_ok");
-            window.location.reload();
-          }}
-          className="h-11 rounded-md px-3 text-xs text-white/60 hover:text-white"
-        >
-          Salir
-        </button>
+        <div className="flex items-center gap-2">
+          <a
+            href="/qr/imprimir.html"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-11 items-center rounded-md bg-white/10 px-3 text-xs font-semibold text-white"
+          >
+            Imprimir QR de mesas
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.removeItem("katrina_owner_pin_ok");
+              window.location.reload();
+            }}
+            className="h-11 rounded-md px-3 text-xs text-white/60 hover:text-white"
+          >
+            Salir
+          </button>
+        </div>
       </header>
       <main className="mx-auto max-w-5xl space-y-6 p-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
