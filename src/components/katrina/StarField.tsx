@@ -1,4 +1,4 @@
-const COLORS = ["#FF3D8A", "#E8B923", "#8B5CF6", "#74ACDF", "#FF6B00"];
+const COLORS = ["rgba(255,255,255,0.55)", "rgba(232,185,35,0.35)", "rgba(255,61,138,0.28)"];
 
 function seeded(i: number, salt: number) {
   const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
@@ -7,18 +7,18 @@ function seeded(i: number, salt: number) {
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
-const DOTS = Array.from({ length: 56 }).map((_, i) => ({
+const DOTS = Array.from({ length: 16 }).map((_, i) => ({
   left: `${r2(seeded(i, 1) * 100)}%`,
   top: `${r2(seeded(i, 2) * 100)}%`,
-  size: r2(2 + seeded(i, 3) * 4),
+  size: r2(1.1 + seeded(i, 3) * 1.6),
   color: COLORS[i % COLORS.length],
-  duration: r2(3 + seeded(i, 4) * 5),
+  duration: r2(6 + seeded(i, 4) * 6),
   delay: r2(-(seeded(i, 5) * 8)),
 }));
 
 export function StarField() {
   return (
-    <div className="starfield pointer-events-none fixed inset-0 z-0" style={{ opacity: 0.55 }} aria-hidden>
+    <div className="starfield pointer-events-none fixed inset-0 z-0" style={{ opacity: 0.28 }} aria-hidden>
       {DOTS.map((d, i) => (
         <span
           key={i}

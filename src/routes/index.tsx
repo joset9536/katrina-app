@@ -7,11 +7,11 @@ import { MenuGrid } from "@/components/katrina/MenuGrid";
 import { SiteFooter } from "@/components/katrina/SiteFooter";
 import { StarField } from "@/components/katrina/StarField";
 import { Wallpaper } from "@/components/katrina/Wallpaper";
-import { FloatingSigns } from "@/components/katrina/FloatingSigns";
 import { ChatPanel } from "@/components/katrina/ChatPanel";
 import { MobileBottomBar } from "@/components/katrina/MobileBottomBar";
 import { MesaBanner } from "@/components/katrina/MesaBanner";
 import { CartBar } from "@/components/katrina/CartBar";
+import { TurnoChip } from "@/components/katrina/TurnoChip";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/")({
@@ -40,7 +40,7 @@ function Index() {
         </main>
         <SiteFooter />
       </div>
-      <FloatingSigns />
+      <TurnoChip />
       <ChatPanel />
       <CartBar />
       <MobileBottomBar />

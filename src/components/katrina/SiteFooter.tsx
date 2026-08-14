@@ -60,6 +60,9 @@ export function SiteFooter() {
           <p className="text-xs uppercase tracking-[0.35em] text-white/50">
             Katrina · Orán, Salta
           </p>
+          <a href="/salon" className="mt-2 text-xs text-white/35 underline-offset-4 hover:text-white/60 hover:underline">
+            Empezar turno
+          </a>
         </div>
       </div>
     </footer>

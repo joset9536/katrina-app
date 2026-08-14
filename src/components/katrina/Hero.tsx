@@ -48,6 +48,13 @@ export function Hero() {
             <NeonButton href="#carta" variant="primary" className="btn-pulse min-h-12">
               {hasValidMesa ? "Ver carta de mi mesa" : "Ver Carta"}
             </NeonButton>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent("katrina:open-chat"))}
+              className="btn-pulse inline-flex min-h-12 items-center justify-center rounded-full border border-[#FF3D8A]/50 px-6 text-sm font-semibold text-[#FF3D8A]"
+            >
+              Llamar mozo
+            </button>
             <NeonButton
               href={whatsappOrderUrl()}
               target="_blank"
