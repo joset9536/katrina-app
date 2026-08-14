@@ -14,7 +14,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   clearSesion,
-  countUsuarios,
+  countLocalUsuarios,
   crearGerente,
   elegirClave,
   entrarConClave,
@@ -62,8 +62,7 @@ async function cerrarTurno(turnoId: string | null) {
 
 function SalonPage() {
   const [sesion, setSesion] = useState<SalonSesion | null>(null);
-  const [ready, setReady] = useState(false);
-  const [boot, setBoot] = useState<"loading" | "vacio" | "login" | "notable" | "offline">("loading");
+  const [boot, setBoot] = useState<"vacio" | "login">("vacio");
   const [tab, setTab] = useState<"mozo" | "gerencia">("mozo");
   const [turnoId, setTurnoId] = useState<string | null>(null);
   const [nombre, setNombre] = useState("");
@@ -77,16 +76,9 @@ function SalonPage() {
       setSesion(existing);
       setTurnoId(localStorage.getItem(STORAGE_TURNO));
       setBoot("login");
-      setReady(true);
       return;
     }
-    countUsuarios().then(({ n, error }) => {
-      if (error === "NETWORK") setBoot("offline");
-      else if (error === "NO_TABLE") setBoot("notable");
-      else if (n === 0) setBoot("vacio");
-      else setBoot("login");
-      setReady(true);
-    });
+    setBoot(countLocalUsuarios() > 0 ? "login" : "vacio");
   }, []);
 
   useEffect(() => {
@@ -171,31 +163,12 @@ function SalonPage() {
     setBoot("login");
   };
 
-  if (!ready) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#12080e] text-white/50">
-        Cargando…
-      </div>
-    );
-  }
-
   if (!sesion) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#12080e] p-6 text-white">
         <div className="w-full max-w-sm space-y-4 rounded-2xl border border-[#C4A35A]/30 bg-black/50 p-6">
           <KatrinaMark size={72} className="mx-auto" />
           <h1 className="text-center text-xl font-semibold text-[#C4A35A]">Iniciar sesión</h1>
-
-          {boot === "offline" && (
-            <p className="rounded-md border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">
-              El salón no está conectado. Los pedidos de las mesas van por WhatsApp 3878 631310.
-            </p>
-          )}
-          {boot === "notable" && (
-            <p className="rounded-md border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">
-              Falta pegar en Supabase el SQL de <code>salon_usuarios</code> (está en supabase/schema.sql).
-            </p>
-          )}
 
           {boot === "vacio" ? (
             <form onSubmit={crearPrimero} className="space-y-3">
@@ -252,7 +225,7 @@ function SalonPage() {
                 className="h-12 w-full rounded-md border border-white/15 bg-black/40 px-3 text-sm"
                 autoFocus
               />
-              <button type="submit" disabled={busy || boot === "offline"} className="h-12 w-full rounded-md bg-[#FF3D8A] text-sm font-semibold text-[#12080e] disabled:opacity-50">
+              <button type="submit" disabled={busy} className="h-12 w-full rounded-md bg-[#FF3D8A] text-sm font-semibold text-[#12080e] disabled:opacity-50">
                 {busy ? "…" : "Continuar"}
               </button>
             </form>

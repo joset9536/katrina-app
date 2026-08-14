@@ -7,6 +7,13 @@ export function isNetworkFailure(err: unknown): boolean {
   return /failed to fetch|networkerror|load failed|network request failed|err_name_not_resolved|timeout/i.test(msg);
 }
 
+async function withTimeout<T>(p: Promise<T>, ms = 5000): Promise<T> {
+  return await Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error("TIMEOUT")), ms)),
+  ]);
+}
+
 function asErrorMessage(err: unknown): string {
   if (isNetworkFailure(err)) return "NETWORK";
   if (err instanceof Error && err.message) return err.message;
@@ -47,23 +54,27 @@ export async function ensureLlamado(cliente: string, mesaId: string): Promise<{
   try {
     if (!isSupabaseConfigured()) return { llamado: null, error: "NETWORK" };
 
-    const { data: existing, error: findError } = await supabase
-      .from("llamados")
-      .select("*")
-      .eq("mesa_id", mesaId)
-      .in("status", ["en_espera", "atendido"])
-      .order("timestamp", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const { data: existing, error: findError } = await withTimeout(
+      supabase
+        .from("llamados")
+        .select("*")
+        .eq("mesa_id", mesaId)
+        .in("status", ["en_espera", "atendido"])
+        .order("timestamp", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    );
 
     if (findError) return { llamado: null, error: isNetworkFailure(findError.message) ? "NETWORK" : findError.message };
     if (existing) return { llamado: existing as LlamadoRow, error: null };
 
-    const { data, error } = await supabase
-      .from("llamados")
-      .insert({ mesa_id: mesaId, cliente_nombre: cliente, status: "en_espera", prioridad: 0 })
-      .select()
-      .single();
+    const { data, error } = await withTimeout(
+      supabase
+        .from("llamados")
+        .insert({ mesa_id: mesaId, cliente_nombre: cliente, status: "en_espera", prioridad: 0 })
+        .select()
+        .single(),
+    );
 
     if (error) return { llamado: null, error: isNetworkFailure(error.message) ? "NETWORK" : error.message };
 
