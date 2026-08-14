@@ -11,8 +11,7 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      className="relative flex items-center overflow-hidden pb-8 pt-20 md:min-h-[70svh] md:pb-14 md:pt-28"
-      style={{ background: "#0b0713" }}
+      className="relative flex min-h-[78svh] items-center overflow-hidden pb-12 pt-24 md:min-h-[88svh] md:pb-16 md:pt-28"
     >
       <div
         ref={ref}
@@ -27,7 +26,9 @@ export function Hero() {
 
           <div className="hero-tag-box mt-4">
             <p className="hero-tag-line">
-              {hasValidMesa ? `Mesa ${numero}. Carta → agregar → llamar mozo.` : "Egüés 502, Orán."}
+              {hasValidMesa
+                ? `Mesa ${numero} · Egüés 502, Orán, Salta`
+                : "Egüés 502, Orán, Salta"}
             </p>
           </div>
 
@@ -56,7 +57,7 @@ export function Hero() {
         <div className="shrink-0">
           <KatrinaMark
             size={200}
-            className="header-skull-mark mx-auto w-24 md:w-52 drop-shadow-[0_0_28px_rgba(255,61,138,0.45)]"
+            className="header-skull-mark mx-auto w-36 md:w-56 drop-shadow-[0_0_28px_rgba(196,163,90,0.35)]"
           />
         </div>
       </div>

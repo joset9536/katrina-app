@@ -61,7 +61,7 @@ export function SiteFooter() {
             Katrina · Orán, Salta
           </p>
           <a href="/salon" className="mt-2 text-xs text-white/35 underline-offset-4 hover:text-white/60 hover:underline">
-            Empezar turno
+            Iniciar sesión
           </a>
         </div>
       </div>

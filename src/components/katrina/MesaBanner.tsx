@@ -28,7 +28,7 @@ export function MesaBanner() {
       )}
       {online && !queryError && hasValidMesa && query.ok && (
         <div className="pointer-events-auto mx-auto w-full max-w-xl rounded-xl border border-[#FF3D8A]/40 bg-[#0E0A1A]/90 px-4 py-2 text-center text-sm text-white shadow-lg backdrop-blur">
-          Estás en la <span className="font-semibold text-[#FF3D8A]">mesa {numero}</span>. Agregá de la carta y llamá al mozo.
+          Mesa {numero} · Egüés 502. Agregá de la carta y llamá al mozo.
         </div>
       )}
     </div>

@@ -383,12 +383,12 @@
 }
 
 .katrina-wallpaper {
-  background-color: #0b0713;
+  background-color: #12080e;
   background-image:
-    radial-gradient(circle at 12% 18%, color-mix(in oklab, #8B5CF6 16%, transparent), transparent 34%),
-    radial-gradient(circle at 88% 8%, color-mix(in oklab, #FF3D8A 12%, transparent), transparent 32%),
-    radial-gradient(circle at 70% 80%, color-mix(in oklab, #E8B923 8%, transparent), transparent 28%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath d='M36 10c3 6 8 8 14 8-6 3-8 8-8 14-6-3-14-3-20 0 0-6-2-11-8-14 6 0 11-2 14-8z' fill='none' stroke='%23FF3D8A' stroke-opacity='0.09' stroke-width='1'/%3E%3C/svg%3E");
+    radial-gradient(circle at 12% 18%, color-mix(in oklab, #6B1D3A 22%, transparent), transparent 36%),
+    radial-gradient(circle at 88% 8%, color-mix(in oklab, #C4A35A 14%, transparent), transparent 32%),
+    radial-gradient(circle at 70% 80%, color-mix(in oklab, #1C1433 28%, transparent), transparent 30%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath d='M36 10c3 6 8 8 14 8-6 3-8 8-8 14-6-3-14-3-20 0 0-6-2-11-8-14 6 0 11-2 14-8z' fill='none' stroke='%23C4A35A' stroke-opacity='0.14' stroke-width='1'/%3E%3C/svg%3E");
   background-size: auto, auto, auto, 72px 72px;
 }
 
@@ -398,12 +398,12 @@
   background: repeating-conic-gradient(
     from 0deg at 50% 0%,
     transparent 0deg 14deg,
-    color-mix(in oklab, #FF3D8A 7%, transparent) 15deg 16deg,
+    color-mix(in oklab, #C4A35A 8%, transparent) 15deg 16deg,
     transparent 17deg 29deg,
-    color-mix(in oklab, #8B5CF6 6%, transparent) 30deg 31deg
+    color-mix(in oklab, #6B1D3A 9%, transparent) 30deg 31deg
   );
   animation: katrina-beams-spin 48s linear infinite;
-  opacity: 0.45;
+  opacity: 0.28;
   mask-image: radial-gradient(ellipse at 50% 0%, black 10%, transparent 62%);
 }
 
@@ -413,18 +413,18 @@
 
 .tapiz-carta {
   background:
-    linear-gradient(180deg, color-mix(in oklab, #FF3D8A 7%, transparent), transparent 18%, transparent 82%, color-mix(in oklab, #8B5CF6 8%, transparent)),
-    radial-gradient(ellipse at 50% 0%, color-mix(in oklab, #FF3D8A 10%, transparent), transparent 55%);
+    linear-gradient(180deg, color-mix(in oklab, #6B1D3A 16%, transparent), transparent 22%, transparent 78%, color-mix(in oklab, #1C1433 14%, transparent)),
+    radial-gradient(ellipse at 50% 0%, color-mix(in oklab, #6B1D3A 18%, transparent), transparent 55%);
 }
 
 .tapiz-noches {
   background:
-    linear-gradient(180deg, color-mix(in oklab, #8B5CF6 10%, transparent), transparent 40%);
+    linear-gradient(180deg, color-mix(in oklab, #1C1433 22%, transparent), transparent 42%);
 }
 
 .tapiz-lugar {
   background:
-    linear-gradient(180deg, color-mix(in oklab, #E8B923 8%, transparent), transparent 42%);
+    linear-gradient(180deg, color-mix(in oklab, #C4A35A 14%, transparent), transparent 44%);
 }
 
 @utility starfield-dot {

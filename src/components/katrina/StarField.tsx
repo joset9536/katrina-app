@@ -1,4 +1,4 @@
-const COLORS = ["rgba(255,255,255,0.55)", "rgba(232,185,35,0.35)", "rgba(255,61,138,0.28)"];
+const COLORS = ["rgba(255,248,230,0.7)", "rgba(196,163,90,0.5)", "rgba(255,255,255,0.35)"];
 
 function seeded(i: number, salt: number) {
   const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;

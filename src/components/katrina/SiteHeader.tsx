@@ -82,12 +82,15 @@ export function SiteHeader() {
             </span>
           </a>
         </div>
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-6 md:flex">
           {NAV.map((item) => (
             <a key={item.href} href={item.href} className="nav-link text-sm">
               {item.label}
             </a>
           ))}
+          <a href="/salon" className="nav-link text-sm">
+            Iniciar sesión
+          </a>
         </nav>
         <div className="ml-2 flex shrink-0 items-center gap-2 sm:gap-3">
           <a
@@ -126,7 +129,7 @@ export function SiteHeader() {
               </a>
             ))}
             <a href="/salon" className="nav-link rounded-lg px-3 py-3 text-base hover:bg-white/5">
-              Empezar turno
+              Iniciar sesión
             </a>
           </nav>
         </div>
