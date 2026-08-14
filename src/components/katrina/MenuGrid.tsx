@@ -66,8 +66,6 @@ import tiramisuAsset from "@/assets/carta/tiramisu.jpg";
 const tiramisu = tiramisuAsset;
 import bandejaHamburguesasAsset from "@/assets/carta/bandeja-hamburguesas.jpg";
 const bandejaHamburguesas = bandejaHamburguesasAsset;
-import hamburguesasPanesColoresAsset from "@/assets/carta/hamburguesas-panes-colores.jpg";
-const hamburguesasPanesColores = hamburguesasPanesColoresAsset;
 import lomoChampinonAsset from "@/assets/carta/lomo-champinon.jpg";
 const lomoChampinon = lomoChampinonAsset;
 import lomoKatrinaAsset from "@/assets/carta/lomo-katrina.jpg";
@@ -114,7 +112,6 @@ const PHOTO_BY_NAME: Record<string, string> = {
   "Katrina Burger": katrinaBurger,
   "Baño de Cheddar": banoCheddarV2,
   "Bandeja de Hamburguesas": bandejaHamburguesas,
-  "Hamburguesas con Panes de Colores": hamburguesasPanesColores,
   "Pizza Común": pizzaComun,
   "Pizza Especial": pizzaEspecial,
   "Pizza Doble Queso": pizzaDobleQueso,
@@ -238,7 +235,7 @@ export function MenuGrid() {
 
 
   return (
-    <section id="carta" className="relative py-24">
+    <section id="carta" className="relative py-12 md:py-20">
       <div className="mx-auto max-w-6xl px-6">
 
         <div
@@ -269,7 +266,7 @@ export function MenuGrid() {
               <button
                 key={cat.id}
                 onClick={() => selectCategory(i)}
-                className={`shrink-0 rounded-full border px-4 py-2 text-sm transition-all ${
+                className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] transition-all md:px-3 md:py-1.5 md:text-xs ${
 
                   isActive
                     ? "border-transparent text-white"

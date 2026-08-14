@@ -10,10 +10,6 @@ import musicaVivo from "@/assets/local/musica-vivo.jpg";
 import picadaMesa from "@/assets/local/picada-mesa.jpg";
 import qrMesa from "@/assets/local/qr-mesa.jpg";
 import detalleVasos from "@/assets/local/detalle-vasos.jpg";
-import patio01 from "@/assets/patio/patio-01.png";
-import patio02 from "@/assets/patio/patio-02.png";
-import patio03 from "@/assets/patio/patio-03.png";
-import patio04 from "@/assets/patio/patio-04.png";
 
 const BORDER_COLORS = ["#FF3D8A", "#E8B923", "#8B5CF6", "#74ACDF"];
 
@@ -25,10 +21,6 @@ const PHOTOS = [
   { src: musicaVivo, label: "Música" },
   { src: qrMesa, label: "Pedido por QR" },
   { src: detalleVasos, label: "Tragos" },
-  { src: patio01, label: "Patio" },
-  { src: patio02, label: "Ambiente" },
-  { src: patio03, label: "Segundo piso" },
-  { src: patio04, label: "Entrada" },
 ];
 
 const MAPS_URL =

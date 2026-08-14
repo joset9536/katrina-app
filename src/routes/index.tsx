@@ -5,8 +5,6 @@ import { Identidad } from "@/components/katrina/Identidad";
 import { Eventos } from "@/components/katrina/Eventos";
 import { MenuGrid } from "@/components/katrina/MenuGrid";
 import { SiteFooter } from "@/components/katrina/SiteFooter";
-import { StarField } from "@/components/katrina/StarField";
-import { Wallpaper } from "@/components/katrina/Wallpaper";
 import { ChatPanel } from "@/components/katrina/ChatPanel";
 import { MobileBottomBar } from "@/components/katrina/MobileBottomBar";
 import { MesaBanner } from "@/components/katrina/MesaBanner";
@@ -20,9 +18,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="relative min-h-screen bg-background pb-28 text-foreground md:pb-0">
-      <Wallpaper />
-      <StarField />
+    <div className="relative min-h-screen bg-[#0b0713] pb-28 text-foreground md:pb-0">
       <div className="relative z-10">
         <SiteHeader />
         <MesaBanner />

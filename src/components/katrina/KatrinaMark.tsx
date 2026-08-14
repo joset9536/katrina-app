@@ -9,8 +9,8 @@ export function KatrinaMark({ className, size = 160 }: Props) {
       src={face}
       alt="Logo Katrina"
       width={size}
-      className={`katrina-mark-float block max-w-full ${className ?? ""}`}
-      style={{ width: size, height: "auto" }}
+      className={`katrina-mark-float block h-auto max-w-full ${className ?? ""}`}
+      style={className ? { height: "auto" } : { width: size, height: "auto" }}
       loading="eager"
       decoding="async"
     />

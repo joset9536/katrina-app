@@ -16,6 +16,7 @@ export function SalonResumen() {
 
   useEffect(() => {
     const load = async () => {
+      try {
       const startDay = new Date();
       startDay.setHours(0, 0, 0, 0);
       const staffCutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
@@ -46,6 +47,17 @@ export function SalonResumen() {
           : null,
         resueltosHoy: resArr.filter((r) => r.status === "resuelto").length,
       });
+      } catch {
+        setM({
+          mesasOcupadas: 0,
+          mesasTotal: 0,
+          colaTotal: 0,
+          urgentes: 0,
+          staffActivo: 0,
+          avgRespuestaMin: null,
+          resueltosHoy: 0,
+        });
+      }
     };
     load();
     const ch = supabase

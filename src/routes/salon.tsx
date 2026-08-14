@@ -25,12 +25,16 @@ const STORAGE = "katrina_staff_nombre";
 const STORAGE_TURNO = "katrina_staff_turno_id";
 
 async function abrirTurno(nombre: string): Promise<string | null> {
-  const { data } = await supabase
-    .from("staff_turnos")
-    .insert({ staff_nombre: nombre, estado: "activo" })
-    .select()
-    .single();
-  return data?.id ?? null;
+  try {
+    const { data } = await supabase
+      .from("staff_turnos")
+      .insert({ staff_nombre: nombre, estado: "activo" })
+      .select()
+      .single();
+    return data?.id ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function cerrarTurno(turnoId: string | null) {
@@ -85,9 +89,7 @@ function SalonPage() {
         <form onSubmit={start} className="w-full max-w-sm space-y-4 rounded-2xl border border-[#FF3D8A]/40 bg-black/50 p-6">
           <KatrinaMark size={72} className="mx-auto" />
           <h1 className="text-center text-xl font-semibold text-[#FF3D8A]">Empezar turno</h1>
-          <p className="text-center text-xs text-white/60">
-            Escribí tu nombre. No hay usuarios ni cuentas. Romy, Luis, quien esté hoy.
-          </p>
+          <p className="text-center text-xs text-white/60">Tu nombre. Sin cuentas.</p>
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -145,9 +147,7 @@ function SalonPage() {
       <main className="mx-auto grid max-w-6xl gap-4 p-4 md:p-6">
         {tab === "llamados" ? (
           <>
-            <p className="text-sm text-white/70">
-              Rosa = te llaman. Atendé, mirá la comanda, llevá el pedido. No hay que crear usuarios.
-            </p>
+            <p className="text-sm text-white/70">Rosa = te llaman. Atendé.</p>
             <ColaLlamados staffNombre={nombre} />
             <Comandas />
             <MisLlamados staffNombre={nombre} />
@@ -155,18 +155,8 @@ function SalonPage() {
           </>
         ) : (
           <>
-            <p className="text-sm text-white/70">
-              Números del salón, cerrar mesa cuando se van, imprimir QR. Mismo lugar, sin otra web.
-            </p>
+            <p className="text-sm text-white/70">Cerrar mesa cuando se van.</p>
             <SalonResumen />
-            <a
-              href="/qr/imprimir.html"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex h-12 items-center justify-center rounded-md bg-white px-4 text-sm font-semibold text-[#0E0A1A]"
-            >
-              Imprimir QR de mesas
-            </a>
             <MesasActivas />
             <MenuEditor />
           </>

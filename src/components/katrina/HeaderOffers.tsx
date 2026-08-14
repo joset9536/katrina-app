@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import daiquiri from "@/assets/barra/daiquiri-frutilla.png";
-import sexOnTheBeach from "@/assets/barra/sex-on-the-beach.png";
-import frozen from "@/assets/barra/frozen-daiquiri.png";
-import menta from "@/assets/barra/trago-menta.png";
-import gancia from "@/assets/barra/jarra-gancia.png";
 
 const OFFERS = [
-  { src: daiquiri, label: "Candy" },
-  { src: sexOnTheBeach, label: "2×1" },
-  { src: frozen, label: "Frozen" },
-  { src: menta, label: "Menta" },
-  { src: gancia, label: "Gancia" },
+  { emoji: "🍸", label: "Candy" },
+  { emoji: "🥃", label: "2×1" },
+  { emoji: "🍓", label: "Frozen" },
+  { emoji: "🍺", label: "Barra" },
 ];
 
 export function HeaderOffers() {
@@ -26,8 +20,12 @@ export function HeaderOffers() {
 
   return (
     <div className="header-offers" aria-label="Promos de barra">
-      <img key={current.src} src={current.src} alt={current.label} className="header-offer-thumb is-front" />
-      <img src={next.src} alt="" className="header-offer-thumb is-back" aria-hidden />
+      <span className="header-offer-thumb is-front" title={current.label}>
+        {current.emoji}
+      </span>
+      <span className="header-offer-thumb is-back" aria-hidden>
+        {next.emoji}
+      </span>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Send, X } from "lucide-react";
 import { toast } from "sonner";
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
-import { whatsappOrderUrl } from "@/lib/whatsapp";
+import { openWhatsApp, whatsappCallUrl } from "@/lib/whatsapp";
 import { useMesa } from "@/hooks/use-mesa";
 import { useOnline } from "@/hooks/use-online";
 import {
@@ -194,12 +194,15 @@ export function ChatPanel() {
     if (ok) setInput("");
   };
 
+  const fallbackWhatsApp = (mesaNum: number | string, name: string) => {
+    const url = whatsappCallUrl({ mesa: mesaNum, nombre: name });
+    toast.error("El salón no respondió. Te abro WhatsApp con tu mesa.");
+    openWhatsApp(url);
+  };
+
   const saveIdentity = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!online) {
-      toast.error("Sin internet. No se puede llamar al mozo.");
-      return;
-    }
+    if (sending) return;
     const u = usuario.trim();
     const parsed = hasValidMesa ? active : parseMesaValue(mesaInput);
     if (!u) {
@@ -212,19 +215,28 @@ export function ChatPanel() {
     }
     persistUser(u);
     persistMesa(parsed.numero);
-    setReady(true);
-    const created = await ensureLlamado(u, parsed.mesaId);
-    if (created.error) {
-      toast.error(created.error.includes("foreign key") ? "Esa mesa no existe." : created.error);
-      setReady(false);
+    if (!online) {
+      fallbackWhatsApp(parsed.numero, u);
       return;
     }
-    if (created.llamado) {
-      setLlamadoId(created.llamado.id);
-      localStorage.setItem(STORAGE_LLAMADO, created.llamado.id);
-      setLlamado(created.llamado);
-      toast.success("Llamado enviado. El mozo ya lo ve.");
+    setSending(true);
+    setLoadError(null);
+    const created = await ensureLlamado(u, parsed.mesaId);
+    setSending(false);
+    if (created.error || !created.llamado) {
+      setReady(false);
+      if (created.error === "NETWORK" || !created.error) {
+        fallbackWhatsApp(parsed.numero, u);
+        return;
+      }
+      toast.error(created.error.includes("foreign key") ? "Esa mesa no existe." : created.error);
+      return;
     }
+    setReady(true);
+    setLlamadoId(created.llamado.id);
+    localStorage.setItem(STORAGE_LLAMADO, created.llamado.id);
+    setLlamado(created.llamado);
+    toast.success("Llamado enviado. El mozo ya lo ve.");
   };
 
   const statusLabel = () => {
@@ -267,16 +279,8 @@ export function ChatPanel() {
 
           {!ready ? (
             <form onSubmit={saveIdentity} className="flex flex-1 flex-col justify-center gap-3 px-5">
-              {!online && <p className="rounded-md border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">Sin internet. No se puede llamar al mozo.</p>}
               {queryError && <p className="rounded-md border border-red-400/40 bg-red-500/10 px-3 py-2 text-xs text-red-100">{queryError}</p>}
-              <p className="text-sm text-white/80">Tu nombre y la mesa. El mozo lo ve al toque.</p>
-              <p className="text-[11px] text-white/40">
-                Si preferís, escribinos por{" "}
-                <a href={whatsappOrderUrl()} target="_blank" rel="noopener noreferrer" className="text-[#FF3D8A] underline">
-                  WhatsApp
-                </a>
-                .
-              </p>
+              <p className="text-sm text-white/80">Nombre y mesa.</p>
               <input
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value)}
@@ -287,15 +291,23 @@ export function ChatPanel() {
               <input
                 value={hasValidMesa ? String(numero) : mesaInput}
                 onChange={(e) => setMesaInput(e.target.value)}
-                placeholder="Número de mesa (1-30)"
+                placeholder="Mesa (1-30)"
                 readOnly={hasValidMesa}
                 className="h-11 rounded-md border border-white/15 bg-black/40 px-3 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none read-only:opacity-70"
                 maxLength={3}
                 inputMode="numeric"
               />
-              <button type="submit" disabled={!online} className="mt-2 h-12 rounded-md bg-[#FF3D8A] px-4 text-sm font-semibold text-[#0E0A1A] active:scale-[0.99] disabled:opacity-50">
-                Llamar al mozo
+              <button type="submit" disabled={sending} className="mt-1 h-12 rounded-md bg-[#FF3D8A] px-4 text-sm font-semibold text-[#0E0A1A] active:scale-[0.99] disabled:opacity-50">
+                {sending ? "Llamando…" : "Llamar al mozo"}
               </button>
+              <a
+                href={whatsappCallUrl({ mesa: hasValidMesa ? numero : mesaInput || null, nombre: usuario })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-11 rounded-md border border-white/20 px-4 text-center text-sm leading-[2.75rem] text-white/80"
+              >
+                Si no anda, WhatsApp
+              </a>
             </form>
           ) : (
             <>

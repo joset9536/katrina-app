@@ -4,9 +4,10 @@ import { toast } from "sonner";
 import { useCart } from "@/hooks/use-cart";
 import { useMesa } from "@/hooks/use-mesa";
 import { useOnline } from "@/hooks/use-online";
-import { cartLineLabel } from "@/lib/cart";
+import { cartLineLabel, formatPedidoText } from "@/lib/cart";
 import { persistUser, readStoredUser, STORAGE_LLAMADO } from "@/lib/mesa";
 import { submitPedido } from "@/lib/pedido";
+import { openWhatsApp, whatsappPedidoUrl } from "@/lib/whatsapp";
 
 export function CartBar() {
   const { numero, mesaId, hasValidMesa } = useMesa();
@@ -34,7 +35,14 @@ export function CartBar() {
     const res = await submitPedido({ cliente, mesaId, lines });
     setSending(false);
     if (!res.ok) {
-      toast.error(res.error || "No se pudo enviar el pedido. Probá de nuevo.");
+      toast.error("El salón no respondió. Te abro WhatsApp con el pedido.");
+      openWhatsApp(
+        whatsappPedidoUrl({
+          mesa: numero,
+          nombre: cliente,
+          pedido: formatPedidoText(lines),
+        }),
+      );
       return;
     }
     if (res.llamadoId) localStorage.setItem(STORAGE_LLAMADO, res.llamadoId);

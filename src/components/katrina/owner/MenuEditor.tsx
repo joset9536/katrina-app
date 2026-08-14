@@ -83,19 +83,7 @@ export function MenuEditor() {
     );
   }
 
-  if (tableMissing) {
-    return (
-      <section className="rounded-xl border border-red-500/30 bg-black/40 p-4">
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-widest text-red-400">
-          Editor de carta — falta un paso técnico
-        </h2>
-        <p className="text-xs text-white/60">
-          Todavía no se creó la tabla en la base de datos. Pedile a quien te ayuda con la web que corra
-          la migración <code className="rounded bg-white/10 px-1">menu_items</code> en Supabase.
-        </p>
-      </section>
-    );
-  }
+  if (tableMissing) return null;
 
   if (rows.length === 0) {
     return (

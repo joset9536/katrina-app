@@ -6,6 +6,10 @@ function getMesa(): string | null {
     : null;
 }
 
+export function whatsappHref(text: string): string {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+}
+
 /**
  * Arma el link de WhatsApp incluyendo la mesa (leída de ?mesa= en la URL)
  * para que el mensaje ya le llegue al mozo con el numero de mesa.
@@ -15,7 +19,32 @@ export function whatsappOrderUrl(): string {
   const text = mesa
     ? `Hola! Soy de la Mesa ${mesa} y quiero hacer un pedido:`
     : "Hola! Quiero hacer un pedido:";
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  return whatsappHref(text);
+}
+
+export function whatsappCallUrl(opts?: { mesa?: string | number | null; nombre?: string }): string {
+  const mesa = opts?.mesa ?? getMesa();
+  const nombre = opts?.nombre?.trim();
+  const parts = ["Hola! Quiero llamar al mozo."];
+  if (mesa) parts.push(`Mesa ${mesa}.`);
+  if (nombre) parts.push(`Soy ${nombre}.`);
+  return whatsappHref(parts.join(" "));
+}
+
+export function whatsappPedidoUrl(opts: {
+  mesa?: string | number | null;
+  nombre?: string;
+  pedido: string;
+}): string {
+  const parts = ["Hola!"];
+  if (opts.mesa) parts.push(`Mesa ${opts.mesa}.`);
+  if (opts.nombre?.trim()) parts.push(`Soy ${opts.nombre.trim()}.`);
+  parts.push(opts.pedido);
+  return whatsappHref(parts.join(" "));
+}
+
+export function openWhatsApp(url: string) {
+  if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
 }
 
 /**

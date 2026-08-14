@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 
 export type MenuItem = {
   name: string;
@@ -32,7 +32,6 @@ export const MENU_CATEGORIES: MenuCategory[] = [
       { name: "Katrina Burger", price: "$16.000", description: "Doble carne 150gr, bacon, cheddar, salsa americana, huevo y papas." },
       { name: "Baño de Cheddar", price: "$3.000", description: "Adicional para cualquier hamburguesa." },
       { name: "Bandeja de Hamburguesas", price: "Consultar", description: "Para compartir: varias hamburguesas con papas al centro." },
-      { name: "Hamburguesas con Panes de Colores", price: "Consultar", description: "Panes artesanales de colores realizados por Carmelo." },
     ],
   },
   {
@@ -149,6 +148,7 @@ export type MenuItemRow = {
  */
 export async function fetchLiveMenuByCategory(): Promise<Record<string, MenuItem[]> | null> {
   try {
+    if (!isSupabaseConfigured()) return null;
     const { data, error } = await supabase
       .from("menu_items")
       .select("*")
