@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { playCallBeep } from "@/lib/notify";
+import { atenderLlamado, listarCola } from "@/lib/salon-bus";
 
 type Llamado = {
   id: string;
@@ -30,14 +30,9 @@ export function ColaLlamados({ staffNombre }: { staffNombre: string }) {
 
   useEffect(() => {
     const load = async () => {
-      const { data, error } = await supabase
-        .from("llamados")
-        .select("*")
-        .eq("status", "en_espera")
-        .order("prioridad", { ascending: false })
-        .order("timestamp", { ascending: true });
-      const next = (data as Llamado[]) || [];
-      if (!error) {
+      const res = await listarCola();
+      const next = (res.items as Llamado[]) || [];
+      if (!res.error) {
         if (primed.current) {
           const newcomers = next.filter((l) => !seenRef.current.has(l.id));
           if (newcomers.length) playCallBeep();
@@ -49,14 +44,9 @@ export function ColaLlamados({ staffNombre }: { staffNombre: string }) {
       setLoading(false);
     };
     load();
-    const ch = supabase
-      .channel("cola-llamados")
-      .on("postgres_changes", { event: "*", schema: "public", table: "llamados" }, () => load())
-      .subscribe();
-    const poll = setInterval(load, 5000);
+    const poll = setInterval(load, 3000);
     const t = setInterval(() => setTick((x) => x + 1), 30000);
     return () => {
-      supabase.removeChannel(ch);
       clearInterval(poll);
       clearInterval(t);
     };
@@ -65,32 +55,18 @@ export function ColaLlamados({ staffNombre }: { staffNombre: string }) {
   const atender = async (l: Llamado) => {
     if (busyId) return;
     setBusyId(l.id);
-    const { data, error } = await supabase
-      .from("llamados")
-      .update({
-        status: "atendido",
-        staff_asignado: staffNombre,
-        respondido_at: new Date().toISOString(),
-      })
-      .eq("id", l.id)
-      .eq("status", "en_espera")
-      .select()
-      .maybeSingle();
+    const res = await atenderLlamado({
+      data: { id: l.id, staff: staffNombre, cliente: l.cliente_nombre, mesaId: l.mesa_id },
+    });
     setBusyId(null);
-    if (error) {
-      toast.error("No se pudo tomar el llamado. Probá de nuevo.");
-      return;
-    }
-    if (!data) {
+    if (res.taken) {
       toast.error("Otro mozo ya tomó esa mesa.");
       return;
     }
-    await supabase.from("chat").insert({
-      mesa_id: l.mesa_id,
-      usuario: staffNombre,
-      tipo: "staff",
-      mensaje: `Hola ${l.cliente_nombre}, soy ${staffNombre}. Ya te atiendo.`,
-    });
+    if (!res.ok) {
+      toast.error(res.error || "No se pudo tomar el llamado. Probá de nuevo.");
+      return;
+    }
     toast.success(`Tomaste la mesa ${l.mesa_id.replace("mesa-", "")}`);
   };
 

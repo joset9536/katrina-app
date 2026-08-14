@@ -1,6 +1,7 @@
 import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { formatPedidoText, type CartLine } from "./cart";
 import { logToSheets } from "./sheets-log";
+import { llamarMozo, enviarChat } from "./salon-bus";
 
 export function isNetworkFailure(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err ?? "");
@@ -52,33 +53,8 @@ export async function ensureLlamado(cliente: string, mesaId: string): Promise<{
   error: string | null;
 }> {
   try {
-    if (!isSupabaseConfigured()) return { llamado: null, error: "NETWORK" };
-
-    const { data: existing, error: findError } = await withTimeout(
-      supabase
-        .from("llamados")
-        .select("*")
-        .eq("mesa_id", mesaId)
-        .in("status", ["en_espera", "atendido"])
-        .order("timestamp", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-    );
-
-    if (findError) return { llamado: null, error: isNetworkFailure(findError.message) ? "NETWORK" : findError.message };
-    if (existing) return { llamado: existing as LlamadoRow, error: null };
-
-    const { data, error } = await withTimeout(
-      supabase
-        .from("llamados")
-        .insert({ mesa_id: mesaId, cliente_nombre: cliente, status: "en_espera", prioridad: 0 })
-        .select()
-        .single(),
-    );
-
-    if (error) return { llamado: null, error: isNetworkFailure(error.message) ? "NETWORK" : error.message };
-
-    await supabase.from("mesas").update({ estado: "ocupada" }).eq("id", mesaId);
+    const res = await withTimeout(llamarMozo({ data: { cliente, mesaId } }), 12000);
+    if (res.error || !res.llamado) return { llamado: null, error: res.error || "No se pudo llamar." };
     logToSheets({
       data: {
         timestamp: new Date().toISOString(),
@@ -87,8 +63,7 @@ export async function ensureLlamado(cliente: string, mesaId: string): Promise<{
         mensaje: "Llamó al mozo",
       },
     }).catch(() => {});
-
-    return { llamado: data as LlamadoRow, error: null };
+    return { llamado: res.llamado, error: null };
   } catch (err) {
     return { llamado: null, error: asErrorMessage(err) };
   }
@@ -106,13 +81,10 @@ export async function submitPedido(opts: {
   if (error || !llamado) return { ok: false, llamadoId: null, error: error || "No se pudo registrar el llamado." };
 
   const mensaje = formatPedidoText(opts.lines);
-  const { error: chatError } = await supabase.from("chat").insert({
-    mensaje,
-    usuario: opts.cliente,
-    mesa_id: opts.mesaId,
-    tipo: "cliente",
+  const chatRes = await enviarChat({
+    data: { mesaId: opts.mesaId, usuario: opts.cliente, tipo: "cliente", mensaje },
   });
-  if (chatError) return { ok: false, llamadoId: llamado.id, error: chatError.message };
+  if (!chatRes.ok) return { ok: false, llamadoId: llamado.id, error: chatRes.error || "No se pudo enviar el pedido." };
 
   const { error: pedidoError } = await supabase.from("pedidos").insert({
     mesa_id: opts.mesaId,

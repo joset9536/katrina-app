@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Send, X } from "lucide-react";
 import { toast } from "sonner";
-import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
-import { openWhatsApp, whatsappCallUrl } from "@/lib/whatsapp";
 import { useMesa } from "@/hooks/use-mesa";
 import { useOnline } from "@/hooks/use-online";
 import {
@@ -13,6 +11,8 @@ import {
   STORAGE_LLAMADO,
 } from "@/lib/mesa";
 import { ensureLlamado, type LlamadoRow } from "@/lib/pedido";
+import { enviarChat, getLlamado, listarChat, listarCola } from "@/lib/salon-bus";
+import { whatsappCallUrl } from "@/lib/whatsapp";
 
 type ChatMsg = {
   id: string;
@@ -59,74 +59,40 @@ export function ChatPanel() {
   const mesaKey = resolvedMesaId || (hasValidMesa ? mesaId : "") || "";
 
   useEffect(() => {
-    if (!open || !ready || !mesaKey || !isSupabaseConfigured()) return;
-    let activeSub = true;
-    const cutoff = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
-
-    supabase
-      .from("chat")
-      .select("*")
-      .eq("mesa_id", mesaKey)
-      .gte("created_at", cutoff)
-      .order("created_at", { ascending: true })
-      .limit(100)
-      .then(({ data, error }) => {
-        if (!activeSub) return;
-        if (error) setLoadError("No se pudieron cargar los mensajes.");
-        else setMessages((data as ChatMsg[]) || []);
-      });
-
-    const channel = supabase
-      .channel(`chat-mesa-${mesaKey}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "chat", filter: `mesa_id=eq.${mesaKey}` },
-        (payload) => {
-          setMessages((prev) => {
-            const next = payload.new as ChatMsg;
-            if (prev.some((m) => m.id === next.id)) return prev;
-            return [...prev, next];
-          });
-        },
-      )
-      .subscribe();
-
+    if (!open || !ready || !mesaKey) return;
+    let live = true;
+    const load = async () => {
+      const res = await listarChat({ data: { mesaId: mesaKey } });
+      if (!live) return;
+      if (res.error) setLoadError("No se pudieron cargar los mensajes.");
+      else setMessages(res.items);
+    };
+    load();
+    const poll = window.setInterval(load, 3000);
     return () => {
-      activeSub = false;
-      supabase.removeChannel(channel);
+      live = false;
+      window.clearInterval(poll);
     };
   }, [open, ready, mesaKey]);
 
   useEffect(() => {
-    if (!ready || !isSupabaseConfigured()) return;
-    let activeSub = true;
-
+    if (!ready) return;
+    let live = true;
     const load = async () => {
-      const { data, error } = await supabase
-        .from("llamados")
-        .select("*")
-        .eq("status", "en_espera")
-        .order("prioridad", { ascending: false })
-        .order("timestamp", { ascending: true });
-      if (!activeSub) return;
-      if (error) setLoadError("No se pudo actualizar el estado del llamado.");
-      if (data) setQueue(data as LlamadoRow[]);
-
+      const cola = await listarCola();
+      if (!live) return;
+      if (cola.error) setLoadError("No se pudo actualizar el estado del llamado.");
+      else setQueue(cola.items);
       if (llamadoId) {
-        const { data: mine } = await supabase.from("llamados").select("*").eq("id", llamadoId).maybeSingle();
-        if (activeSub) setLlamado((mine as LlamadoRow) || null);
+        const mine = await getLlamado({ data: { id: llamadoId } });
+        if (live) setLlamado(mine.llamado);
       }
     };
     load();
-    const poll = window.setInterval(load, 8000);
-    const ch = supabase
-      .channel("llamados-client")
-      .on("postgres_changes", { event: "*", schema: "public", table: "llamados" }, () => load())
-      .subscribe();
+    const poll = window.setInterval(load, 3000);
     return () => {
-      activeSub = false;
+      live = false;
       window.clearInterval(poll);
-      supabase.removeChannel(ch);
     };
   }, [ready, llamadoId]);
 
@@ -147,22 +113,14 @@ export function ChatPanel() {
       toast.error("Sin internet. El mensaje no salió.");
       return false;
     }
-    if (!isSupabaseConfigured()) {
-      toast.error("El sistema de mesas no está conectado.");
-      return false;
-    }
     setSending(true);
     setLoadError(null);
-    const isUrgente = /urgente/i.test(trimmed);
-    const { error } = await supabase.from("chat").insert({
-      mensaje: trimmed,
-      usuario,
-      mesa_id: mesaKey,
-      tipo: "cliente",
+    const sent = await enviarChat({
+      data: { mesaId: mesaKey, usuario, tipo: "cliente", mensaje: trimmed },
     });
-    if (error) {
+    if (!sent.ok) {
       setSending(false);
-      toast.error("No se pudo enviar. Probá de nuevo.");
+      toast.error(sent.error || "No se pudo enviar. Probá de nuevo.");
       return false;
     }
 
@@ -181,9 +139,6 @@ export function ChatPanel() {
         setLlamado(created.llamado);
       }
     }
-    if (isUrgente && llamadoId) {
-      await supabase.from("llamados").update({ prioridad: 1 }).eq("id", llamadoId);
-    }
     setSending(false);
     return true;
   };
@@ -192,12 +147,6 @@ export function ChatPanel() {
     if (!input.trim()) return;
     const ok = await sendText(input);
     if (ok) setInput("");
-  };
-
-  const fallbackWhatsApp = (mesaNum: number | string, name: string) => {
-    const url = whatsappCallUrl({ mesa: mesaNum, nombre: name });
-    toast.error("El salón no respondió. Te abro WhatsApp con tu mesa.");
-    openWhatsApp(url);
   };
 
   const saveIdentity = async (e: React.FormEvent) => {
@@ -215,21 +164,13 @@ export function ChatPanel() {
     }
     persistUser(u);
     persistMesa(parsed.numero);
-    if (!online) {
-      fallbackWhatsApp(parsed.numero, u);
-      return;
-    }
     setSending(true);
     setLoadError(null);
     const created = await ensureLlamado(u, parsed.mesaId);
     setSending(false);
     if (created.error || !created.llamado) {
       setReady(false);
-      if (created.error === "NETWORK" || !created.error) {
-        fallbackWhatsApp(parsed.numero, u);
-        return;
-      }
-      toast.error(created.error.includes("foreign key") ? "Esa mesa no existe." : created.error);
+      toast.error(created.error || "El llamado no llegó. Tocá de nuevo.");
       return;
     }
     setReady(true);

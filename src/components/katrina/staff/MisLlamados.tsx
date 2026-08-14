@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { fetchPedidosMesa, isPedidoMessage, parsePedidoFromChat, type PedidoRow } from "@/lib/pedido";
+import { isPedidoMessage, parsePedidoFromChat } from "@/lib/pedido";
 import { cartLineLabel, type CartLine } from "@/lib/cart";
+import { enviarChat, listarChat, listarMisLlamados, resolverLlamado } from "@/lib/salon-bus";
 
 type Llamado = {
   id: string;
@@ -35,95 +35,54 @@ export function MisLlamados({ staffNombre }: { staffNombre: string }) {
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase
-        .from("llamados")
-        .select("*")
-        .eq("staff_asignado", staffNombre)
-        .eq("status", "atendido")
-        .order("respondido_at", { ascending: false });
-      setItems((data as Llamado[]) || []);
+      const res = await listarMisLlamados({ data: { staff: staffNombre } });
+      setItems((res.items as Llamado[]) || []);
+      if (openMesa) await loadChat(openMesa);
     };
     load();
-    const ch = supabase
-      .channel(`mis-llamados-${staffNombre}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "llamados" }, () => load())
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "chat" }, (payload) => {
-        const msg = payload.new as ChatMsg;
-        setChatMap((prev) => {
-          const list = prev[msg.mesa_id] || [];
-          if (list.some((m) => m.id === msg.id)) return prev;
-          return { ...prev, [msg.mesa_id]: [...list, msg] };
-        });
-        if (isPedidoMessage(msg.mensaje)) {
-          setPedidoMap((prev) => ({
-            ...prev,
-            [msg.mesa_id]: [...(prev[msg.mesa_id] || []), ...parsePedidoFromChat(msg.mensaje)],
-          }));
-        }
-      })
-      .on("postgres_changes", { event: "*", schema: "public", table: "pedidos" }, () => {
-        if (openMesa) void loadPedido(openMesa);
-      })
-      .subscribe();
-    const poll = setInterval(load, 5000);
+    const poll = setInterval(load, 3000);
     return () => {
-      supabase.removeChannel(ch);
       clearInterval(poll);
     };
   }, [staffNombre, openMesa]);
 
   const loadChat = async (mesaId: string) => {
-    const { data } = await supabase
-      .from("chat")
-      .select("*")
-      .eq("mesa_id", mesaId)
-      .order("created_at", { ascending: true })
-      .limit(100);
-    const msgs = (data as ChatMsg[]) || [];
+    const res = await listarChat({ data: { mesaId } });
+    const msgs = (res.items as ChatMsg[]) || [];
     setChatMap((prev) => ({ ...prev, [mesaId]: msgs }));
     const fromChat = msgs.filter((m) => isPedidoMessage(m.mensaje)).flatMap((m) => parsePedidoFromChat(m.mensaje));
     setPedidoMap((prev) => ({ ...prev, [mesaId]: fromChat }));
   };
 
-  const loadPedido = async (mesaId: string) => {
-    const rows: PedidoRow[] = await fetchPedidosMesa(mesaId);
-    const openRows = rows.filter((r) => r.status === "pendiente" || r.status === "visto");
-    if (openRows.length) {
-      setPedidoMap((prev) => ({ ...prev, [mesaId]: openRows.flatMap((r) => r.items) }));
-    }
-  };
-
   const openChat = async (mesaId: string) => {
     setOpenMesa(mesaId);
     setTab("pedido");
-    await Promise.all([loadChat(mesaId), loadPedido(mesaId)]);
+    await loadChat(mesaId);
   };
 
   const enviar = async () => {
     const text = draft.trim();
     if (!text || !openMesa || sending) return;
     setSending(true);
-    const { error } = await supabase.from("chat").insert({
-      mesa_id: openMesa,
-      usuario: staffNombre,
-      tipo: "staff",
-      mensaje: text,
+    const res = await enviarChat({
+      data: { mesaId: openMesa, usuario: staffNombre, tipo: "staff", mensaje: text },
     });
     setSending(false);
-    if (error) {
-      toast.error("No se pudo enviar.");
+    if (!res.ok) {
+      toast.error(res.error || "No se pudo enviar.");
       return;
     }
     setDraft("");
+    await loadChat(openMesa);
   };
 
   const resolver = async (l: Llamado) => {
     if (busyId) return;
     setBusyId(l.id);
-    const { error } = await supabase.from("llamados").update({ status: "resuelto" }).eq("id", l.id);
+    const res = await resolverLlamado({ data: { id: l.id } });
     setBusyId(null);
-    if (error) {
-      toast.error("No se pudo marcar como atendido.");
+    if (!res.ok) {
+      toast.error(res.error || "No se pudo marcar como atendido.");
       return;
     }
     toast.success(`Mesa ${l.mesa_id.replace("mesa-", "")}: llamado cerrado. La mesa sigue ocupada.`);
