@@ -1,28 +1,36 @@
 import { useInView } from "@/hooks/use-in-view";
-import { Music, Tv, GlassWater } from "lucide-react";
+import pantallaFutbol from "@/assets/noches/pantalla-futbol.jpg";
+import musicaNoche from "@/assets/noches/musica-noche.jpg";
+import barra from "@/assets/noches/barra.jpg";
+import cocina from "@/assets/noches/cocina.jpg";
 
 const NOCHES = [
   {
-    icon: Tv,
+    src: pantallaFutbol,
     title: "Pantalla y fútbol",
     body: "Los partidos se miran en el local. Si hay fecha especial, se avisa en la mesa.",
   },
   {
-    icon: Music,
+    src: musicaNoche,
     title: "Música de noche",
     body: "El salón se arma para quedarse: música, barra y mesa larga.",
   },
   {
-    icon: GlassWater,
-    title: "Barra y cocina",
-    body: "Tragos, hamburguesas, pizzas y picadas. Pedí por el QR o llamá al mozo.",
+    src: barra,
+    title: "Barra",
+    body: "Tragos y vasos fríos. Pedí por el QR o llamá al mozo.",
+  },
+  {
+    src: cocina,
+    title: "Cocina",
+    body: "Hamburguesas, pizzas y picadas que salen de acá a tu mesa.",
   },
 ];
 
 export function Eventos() {
   const { ref, visible } = useInView<HTMLDivElement>();
   return (
-    <section id="eventos" className="relative py-24">
+    <section id="eventos" className="relative py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6">
         <div ref={ref} className={`fade-up mb-10 text-center ${visible ? "is-visible" : ""}`}>
           <span className="text-xs uppercase tracking-[0.4em] text-white/50">De noche</span>
@@ -30,18 +38,22 @@ export function Eventos() {
             <span className="text-neon-gradient">En Katrina</span>
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-white/60">
-            No hay calendario inventado. Esto es lo que pasa en el local, de verdad.
+            Pantalla, música, barra y cocina. Lo que pasa en el local.
           </p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           {NOCHES.map((n) => (
             <article
               key={n.title}
-              className="rounded-xl border border-white/10 bg-black/40 p-6"
+              className="overflow-hidden rounded-xl border border-white/10 bg-black/40"
             >
-              <n.icon className="text-[#FF3D8A]" size={26} />
-              <h3 className="mt-4 font-display text-xl">{n.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/65">{n.body}</p>
+              <div className="aspect-[4/3] w-full overflow-hidden">
+                <img src={n.src} alt={n.title} className="h-full w-full object-cover" loading="lazy" />
+              </div>
+              <div className="p-5">
+                <h3 className="font-display text-xl">{n.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/65">{n.body}</p>
+              </div>
             </article>
           ))}
         </div>
