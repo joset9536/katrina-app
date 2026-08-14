@@ -147,7 +147,7 @@ export function WorldCupBanner() {
             <span className="wc-kicker">Noches de fútbol</span>
             <h2 className="wc-title mt-4">¡Argentina vs Inglaterra!</h2>
             <p className="wc-detail mt-4">
-              Miércoles 15 de julio · 16:00 hs — pantalla gigante, combos, promos y el ambiente Katrina en Egüés 517.
+              Miércoles 15 de julio · 16:00 hs — pantalla gigante, combos, promos y el ambiente Katrina en Egüés 502.
             </p>
           </div>
           <img

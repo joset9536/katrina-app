@@ -124,7 +124,7 @@ export const MENU_CATEGORIES: MenuCategory[] = [
 
 export const KATRINA_INFO = {
   nombre: "Katrina",
-  direccion: "Egüés 517, Orán, Salta",
+  direccion: "Egüés 502, Orán, Salta",
   horario: "Todos los días de 19:00 a 02:00 hs",
   whatsapp: "5493878631310",
 };

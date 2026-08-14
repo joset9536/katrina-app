@@ -32,7 +32,7 @@ export function Hero() {
             <p className="hero-tag-line">
               {hasValidMesa
                 ? `Mesa ${numero}. Mirá la carta, agregá lo que quieras y llamá al mozo.`
-                : "Restobar de Orán. Hamburguesas, pizzas, picadas y tragos. Egüés 517."}
+                : "Restobar de Orán. Hamburguesas, pizzas, picadas y tragos. Egüés 502."}
             </p>
           </div>
 

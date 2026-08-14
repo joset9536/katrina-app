@@ -35,7 +35,7 @@ import milanesaKatrinaAsset from "@/assets/carta/milanesa-katrina.png";
 const milanesaKatrina = milanesaKatrinaAsset;
 import especialKatrinaAsset from "@/assets/carta/especial-katrina-v2.jpg";
 const especialKatrina = especialKatrinaAsset;
-import charlyGratinadoAsset from "@/assets/carta/charly-gratinado.png";
+import charlyGratinadoAsset from "@/assets/carta/charly-gratinado-v2.jpg";
 const charlyGratinado = charlyGratinadoAsset;
 import nachosDesiertoAsset from "@/assets/carta/nachos-desierto.jpg";
 const nachosDesierto = nachosDesiertoAsset;
@@ -300,7 +300,7 @@ export function MenuGrid() {
 
           <MenuSwiper flat={flat} pos={swipePos} onPosChange={handleSwipePos} />
 
-          <div className="hidden gap-3 sm:gap-5 md:grid md:grid-cols-2 lg:grid-cols-3">
+          <div className="hidden gap-3 sm:grid sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
             {active.items.map((item, i) => (
               <MenuCard
                 key={`${active.id}-${item.name}`}

@@ -81,18 +81,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Katrina, restobar en Egüés 517, Orán. Carta, neón y pedido a la mesa. WhatsApp 3878 631310.",
+          "Katrina, restobar en Egüés 502, Orán. Carta, neón y pedido a la mesa. WhatsApp 3878 631310.",
       },
       { property: "og:title", content: "Katrina — Restobar · Orán" },
       {
         property: "og:description",
-        content: "Katrina, restobar en Egüés 517, Orán. Carta, neón y pedido a la mesa.",
+        content: "Katrina, restobar en Egüés 502, Orán. Carta, neón y pedido a la mesa.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#0b0a12" },
       { name: "twitter:title", content: "Katrina — Restobar · Orán" },
-      { name: "twitter:description", content: "Katrina, restobar en Egüés 517, Orán. Carta y pedido a la mesa." },
+      { name: "twitter:description", content: "Katrina, restobar en Egüés 502, Orán. Carta y pedido a la mesa." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/166f27cc-cc44-456e-b913-b814ffc1ad38/id-preview-b1c384f0--f1c81c5c-550d-4cca-b2b1-62bd01251e05.lovable.app-1783989257103.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/166f27cc-cc44-456e-b913-b814ffc1ad38/id-preview-b1c384f0--f1c81c5c-550d-4cca-b2b1-62bd01251e05.lovable.app-1783989257103.png" },
     ],

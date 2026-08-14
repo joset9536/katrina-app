@@ -126,7 +126,9 @@ function OwnerPage() {
       <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
         <div>
           <h1 className="text-lg font-semibold text-[#FF3D8A]">Dashboard</h1>
-          <p className="text-[11px] text-white/50">Actualiza en tiempo real</p>
+            <p className="text-[11px] text-white/50">
+            Si hay llamados en cola o mesas ocupadas, el salón está activo. Cerrar mesa cuando se van.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <a

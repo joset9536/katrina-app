@@ -33,7 +33,7 @@ const PHOTOS = [
 
 const MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=" +
-  encodeURIComponent("Egüés 517, Orán, Salta");
+  encodeURIComponent("Egüés 502, Orán, Salta");
 
 export function Identidad() {
   const { ref, visible } = useInView<HTMLDivElement>();
@@ -70,7 +70,7 @@ export function Identidad() {
         <div ref={ref} className={`fade-up mb-8 text-center ${visible ? "is-visible" : ""}`}>
           <span className="text-xs uppercase tracking-[0.4em] text-white/50">El lugar</span>
           <h2 className="mt-3 font-display text-3xl md:text-4xl">
-            Egüés 517 · <span className="text-neon-gradient">Orán</span>
+            Egüés 502 · <span className="text-neon-gradient">Orán</span>
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-sm text-white/65">
             Restobar de noche: hamburguesas, pizzas, picadas y tragos. Pedí desde la mesa con el QR.
@@ -78,7 +78,7 @@ export function Identidad() {
           <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <div className="flex items-center gap-2 text-sm text-white/80">
               <MapPin size={16} className="text-white/60" />
-              Egüés 517, Orán, Salta
+              Egüés 502, Orán, Salta
             </div>
             <NeonButton href={MAPS_URL} target="_blank" rel="noopener noreferrer" variant="ghost">
               Cómo llegar

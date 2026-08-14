@@ -50,7 +50,7 @@ export function MenuSwiper({
 
 
   return (
-    <div className="md:hidden">
+    <div className="sm:hidden">
       <div className="mb-3 flex items-center justify-between px-1 text-[11px] uppercase tracking-[0.25em] text-white/50">
         <span>{item.categoryLabel}</span>
         <span>

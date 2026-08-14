@@ -40,16 +40,16 @@ export function ItemOrderControls({ name, price, pizzaMode, priceWhole, priceHal
           <button
             type="button"
             onClick={() => setVariant("entera")}
-            className={`h-11 rounded-full text-xs font-semibold active:scale-95 ${
+            className={`h-11 rounded-full px-2 text-xs font-semibold active:scale-95 ${
               variant === "entera" ? "bg-[#FF3D8A] text-[#0E0A1A]" : "bg-white/10 text-white/70"
             }`}
           >
-            Entera
+            Entera · compartir
           </button>
           <button
             type="button"
             onClick={() => setVariant("media")}
-            className={`h-11 rounded-full text-xs font-semibold active:scale-95 ${
+            className={`h-11 rounded-full px-2 text-xs font-semibold active:scale-95 ${
               variant === "media" ? "bg-[#FF3D8A] text-[#0E0A1A]" : "bg-white/10 text-white/70"
             }`}
           >

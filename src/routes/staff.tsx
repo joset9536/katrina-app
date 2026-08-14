@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ColaLlamados } from "@/components/katrina/staff/ColaLlamados";
 import { MisLlamados } from "@/components/katrina/staff/MisLlamados";
 import { MapaMesasRef } from "@/components/katrina/staff/MapaMesasRef";
+import { Comandas } from "@/components/katrina/staff/Comandas";
 import { PinGate } from "@/components/katrina/PinGate";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -137,7 +138,17 @@ function StaffPage() {
         </div>
       </header>
       <main className="mx-auto grid max-w-6xl gap-4 p-4 md:p-6">
+        <section className="rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/75">
+          <p className="font-semibold text-white">Cómo usarlo (tipo Fudo, simple)</p>
+          <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs leading-relaxed">
+            <li>Cuando suena o aparece rosa, alguien llamó. Tocá <strong>Atender</strong>.</li>
+            <li>Mirá la <strong>comanda</strong> (qué pidieron) y llevá eso a la mesa.</li>
+            <li>Si te escriben, respondé en <strong>Mis mesas</strong>.</li>
+            <li><strong>Listo</strong> cierra el llamado. La mesa sigue ocupada hasta que caja la cierre.</li>
+          </ol>
+        </section>
         <ColaLlamados staffNombre={nombre} />
+        <Comandas />
         <MisLlamados staffNombre={nombre} />
         <MapaMesasRef staffNombre={nombre} />
       </main>
