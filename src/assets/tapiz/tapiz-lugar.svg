@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <defs>
+    <pattern id="lugar" width="180" height="180" patternUnits="userSpaceOnUse">
+      <rect width="180" height="180" fill="#161008"/>
+      <g fill="none" stroke="#c4a35a" stroke-width="0.65" opacity="0.32">
+        <path d="M90 20c8 15 20 20 35 20-15 8-20 20-20 35-15-8-35-8-50 0 0-15-5-27-20-35 15 0 27-5 35-20z"/>
+        <path d="M0 20c8 15 20 20 35 20C20 48 15 60 15 75c-15-8-35-8-50 0 0-15-5-27-20-35 15 0 27-5 35-20z"/>
+        <path d="M180 20c8 15 20 20 35 20-15 8-20 20-20 35-15-8-35-8-50 0 0-15-5-27-20-35 15 0 27-5 35-20z" transform="translate(-180 0)"/>
+        <path d="M90 200c8 15 20 20 35 20-15 8-20 20-20 35-15-8-35-8-50 0 0-15-5-27-20-35 15 0 27-5 35-20z" transform="translate(0 -180)"/>
+        <rect x="70" y="70" width="40" height="40" rx="2" transform="rotate(45 90 90)"/>
+        <circle cx="0" cy="0" r="8"/>
+        <circle cx="180" cy="0" r="8"/>
+        <circle cx="0" cy="180" r="8"/>
+        <circle cx="180" cy="180" r="8"/>
+      </g>
+      <g fill="#e8b923" opacity="0.12">
+        <circle cx="90" cy="90" r="2"/>
+        <circle cx="0" cy="0" r="1.4"/>
+        <circle cx="180" cy="0" r="1.4"/>
+        <circle cx="0" cy="180" r="1.4"/>
+        <circle cx="180" cy="180" r="1.4"/>
+      </g>
+    </pattern>
+  </defs>
+  <rect width="180" height="180" fill="url(#lugar)"/>
+</svg>

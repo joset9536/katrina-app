@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <defs>
+    <pattern id="carta" width="180" height="180" patternUnits="userSpaceOnUse">
+      <rect width="180" height="180" fill="#1a0a10"/>
+      <g fill="none" stroke="#8a2048" stroke-width="0.75" opacity="0.42">
+        <path d="M90 16c9 17 24 24 41 24-17 9-24 24-24 41-17-9-41-9-58 0 0-17-7-32-24-41 17 0 32-7 41-24z"/>
+        <path d="M0 16c9 17 24 24 41 24C24 49 17 64 17 81c-17-9-41-9-58 0 0-17-7-32-24-41 17 0 32-7 41-24z"/>
+        <path d="M180 16c9 17 24 24 41 24-17 9-24 24-24 41-17-9-41-9-58 0 0-17-7-32-24-41 17 0 32-7 41-24z" transform="translate(-180 0)"/>
+        <path d="M90 196c9 17 24 24 41 24-17 9-24 24-24 41-17-9-41-9-58 0 0-17-7-32-24-41 17 0 32-7 41-24z" transform="translate(0 -180)"/>
+        <circle cx="90" cy="90" r="26"/>
+        <circle cx="0" cy="0" r="11"/>
+        <circle cx="180" cy="0" r="11"/>
+        <circle cx="0" cy="180" r="11"/>
+        <circle cx="180" cy="180" r="11"/>
+      </g>
+      <g fill="#ff3d8a" opacity="0.1">
+        <circle cx="90" cy="90" r="2.4"/>
+        <circle cx="0" cy="90" r="1.4"/>
+        <circle cx="180" cy="90" r="1.4"/>
+        <circle cx="90" cy="0" r="1.4"/>
+        <circle cx="90" cy="180" r="1.4"/>
+      </g>
+    </pattern>
+  </defs>
+  <rect width="180" height="180" fill="url(#carta)"/>
+</svg>

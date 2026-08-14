@@ -12,17 +12,14 @@ import { ConversacionesPanel } from "@/components/katrina/ConversacionesPanel";
 import { KatrinaMark } from "@/components/katrina/KatrinaMark";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Wallpaper } from "@/components/katrina/Wallpaper";
 import {
   clearSesion,
-  ensureBrendaGerente,
   GERENTE_NOMBRE,
-  elegirClave,
   entrarConClave,
-  loginNombre,
   readSesion,
   writeSesion,
   type SalonSesion,
-  type SalonUsuario,
 } from "@/lib/salon-auth";
 import { toast } from "sonner";
 
@@ -62,21 +59,17 @@ async function cerrarTurno(turnoId: string | null) {
 
 function SalonPage() {
   const [sesion, setSesion] = useState<SalonSesion | null>(null);
-  const [boot, setBoot] = useState<"login">("login");
   const [tab, setTab] = useState<"mozo" | "gerencia">("mozo");
   const [turnoId, setTurnoId] = useState<string | null>(null);
-  const [nombre, setNombre] = useState("");
+  const [nombre, setNombre] = useState(GERENTE_NOMBRE);
   const [clave, setClave] = useState("");
-  const [pendiente, setPendiente] = useState<SalonUsuario | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    ensureBrendaGerente();
     const existing = readSesion();
     if (existing && existing.rol === "gerente" && existing.nombre.toLowerCase() !== GERENTE_NOMBRE.toLowerCase()) {
       clearSesion();
       setNombre(GERENTE_NOMBRE);
-      setBoot("login");
       return;
     }
     if (existing) {
@@ -87,10 +80,7 @@ function SalonPage() {
       writeSesion(still);
       setSesion(still);
       setTurnoId(localStorage.getItem(STORAGE_TURNO));
-    } else {
-      setNombre(GERENTE_NOMBRE);
     }
-    setBoot("login");
   }, []);
 
   useEffect(() => {
@@ -112,39 +102,14 @@ function SalonPage() {
     setTab(s.rol === "gerente" ? "gerencia" : "mozo");
   };
 
-  const seguirNombre = async (e: React.FormEvent) => {
+  const entrar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
-    const res = await loginNombre(nombre);
-    setBusy(false);
-    if (res.error || !res.usuario) {
-      toast.error(
-        res.error === "NO_TABLE"
-          ? "Falta crear la tabla de usuarios en Supabase."
-          : res.error || "No se pudo entrar.",
-      );
-      return;
-    }
-    if (!res.usuario.tiene_clave) {
-      setPendiente(res.usuario);
-      setClave("");
-      return;
-    }
-    setPendiente(res.usuario);
-    setClave("");
-  };
-
-  const confirmarClave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!pendiente || busy) return;
-    setBusy(true);
-    const res = pendiente.tiene_clave
-      ? await entrarConClave(pendiente.nombre, clave)
-      : await elegirClave(pendiente.nombre, clave);
+    const res = await entrarConClave(nombre, clave);
     setBusy(false);
     if (res.error || !res.sesion) {
-      toast.error(res.error || "No se pudo entrar.");
+      toast.error(res.error || "No se pudo entrar. Tocá de nuevo.");
       return;
     }
     afterLogin(res.sesion);
@@ -154,58 +119,40 @@ function SalonPage() {
     await cerrarTurno(turnoId);
     clearSesion();
     setSesion(null);
-    setPendiente(null);
-    setNombre("");
+    setNombre(GERENTE_NOMBRE);
     setClave("");
     setTurnoId(null);
-    setBoot("login");
   };
 
   if (!sesion) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#12080e] p-6 text-white">
-        <div className="w-full max-w-sm space-y-4 rounded-2xl border border-[#C4A35A]/30 bg-black/50 p-6">
+      <div className="relative flex min-h-screen items-center justify-center p-6 text-white">
+        <Wallpaper />
+        <div className="katrina-frame relative z-10 w-full max-w-sm space-y-4 rounded-2xl border border-[#C4A35A]/35 bg-[#12080e]/80 p-6 backdrop-blur-sm">
           <KatrinaMark size={72} className="mx-auto" />
           <h1 className="text-center text-xl font-semibold text-[#C4A35A]">Iniciar sesión</h1>
-
-          {pendiente ? (
-            <form onSubmit={confirmarClave} className="space-y-3">
-              <p className="text-center text-xs text-white/60">
-                {pendiente.tiene_clave
-                  ? `Hola ${pendiente.nombre}. Tu clave.`
-                  : `Hola ${pendiente.nombre}. Primera vez: elegí la clave que quieras.`}
-              </p>
-              <input
-                type="password"
-                value={clave}
-                onChange={(e) => setClave(e.target.value)}
-                placeholder="Clave"
-                className="h-12 w-full rounded-md border border-white/15 bg-black/40 px-3 text-sm"
-                autoFocus
-              />
-              <button type="submit" disabled={busy} className="h-12 w-full rounded-md bg-[#FF3D8A] text-sm font-semibold text-[#12080e] disabled:opacity-50">
-                {busy ? "Entrando…" : "Entrar"}
-              </button>
-              <button type="button" onClick={() => setPendiente(null)} className="block w-full text-center text-xs text-white/40">
-                Otro nombre
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={seguirNombre} className="space-y-3">
-              <p className="text-center text-xs text-white/60">Gerente: Brenda. Los mozos, el nombre que les cargó ella.</p>
-              <input
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                placeholder="Brenda"
-                className="h-12 w-full rounded-md border border-white/15 bg-black/40 px-3 text-sm"
-                autoFocus
-              />
-              <button type="submit" disabled={busy} className="h-12 w-full rounded-md bg-[#FF3D8A] text-sm font-semibold text-[#12080e] disabled:opacity-50">
-                {busy ? "…" : "Continuar"}
-              </button>
-            </form>
-          )}
-
+          <form onSubmit={entrar} className="space-y-3">
+            <p className="text-center text-xs text-white/60">
+              Gerente: Brenda. Los mozos, el nombre y la clave que les cargó ella.
+            </p>
+            <input
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              placeholder="Brenda"
+              className="h-12 w-full rounded-md border border-white/15 bg-black/40 px-3 text-sm"
+              autoFocus
+            />
+            <input
+              type="password"
+              value={clave}
+              onChange={(e) => setClave(e.target.value)}
+              placeholder="Clave"
+              className="h-12 w-full rounded-md border border-white/15 bg-black/40 px-3 text-sm"
+            />
+            <button type="submit" disabled={busy} className="h-12 w-full rounded-md bg-[#FF3D8A] text-sm font-semibold text-[#12080e] disabled:opacity-50">
+              {busy ? "Entrando…" : "Entrar"}
+            </button>
+          </form>
           <Link to="/" className="block text-center text-xs text-white/40">
             Volver a la carta
           </Link>
@@ -218,8 +165,9 @@ function SalonPage() {
   const esGerente = sesion.rol === "gerente";
 
   return (
-    <div className="min-h-screen bg-[#12080e] text-white">
-      <header className="border-b border-white/10 px-4 py-4 sm:px-6">
+    <div className="relative min-h-screen text-white">
+      <Wallpaper />
+      <header className="relative z-10 border-b border-[#C4A35A]/20 px-4 py-4 sm:px-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <KatrinaMark size={40} />
@@ -257,7 +205,7 @@ function SalonPage() {
           )}
         </div>
       </header>
-      <main className="mx-auto grid max-w-6xl gap-4 p-4 md:p-6">
+      <main className="relative z-10 mx-auto grid max-w-6xl gap-4 p-4 md:p-6">
         {tab === "mozo" ? (
           <>
             <p className="text-sm text-white/70">

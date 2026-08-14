@@ -1,14 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-
-type ChatRow = {
-  id: string;
-  mesa_id: string;
-  usuario: string;
-  tipo: string;
-  mensaje: string;
-  created_at: string;
-};
+import { listarConversaciones, type ChatRow } from "@/lib/salon-bus";
 
 export function ConversacionesPanel() {
   const [rows, setRows] = useState<ChatRow[]>([]);
@@ -16,29 +7,21 @@ export function ConversacionesPanel() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let live = true;
     const load = async () => {
-      try {
-        const start = new Date();
-        start.setHours(0, 0, 0, 0);
-        const { data, error: err } = await supabase
-          .from("chat")
-          .select("id,mesa_id,usuario,tipo,mensaje,created_at")
-          .gte("created_at", start.toISOString())
-          .order("created_at", { ascending: true })
-          .limit(300);
-        if (err) setError("No se pudieron cargar los chats.");
-        else setRows((data as ChatRow[]) || []);
-      } catch {
-        setError("El salón no está conectado.");
+      const res = await listarConversaciones({ data: {} });
+      if (!live) return;
+      if (res.error) setError(res.error);
+      else {
+        setError(null);
+        setRows(res.items);
       }
     };
     load();
-    const ch = supabase
-      .channel("gerente-chats")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "chat" }, () => load())
-      .subscribe();
+    const poll = window.setInterval(load, 4000);
     return () => {
-      supabase.removeChannel(ch);
+      live = false;
+      window.clearInterval(poll);
     };
   }, []);
 
@@ -50,7 +33,7 @@ export function ConversacionesPanel() {
   const visible = mesa === "todas" ? rows : rows.filter((r) => r.mesa_id === mesa);
 
   return (
-    <section className="rounded-xl border border-white/10 bg-black/40 p-4">
+    <section className="katrina-frame rounded-xl border border-[#FF3D8A]/25 bg-black/45 p-4">
       <h2 className="text-sm font-semibold uppercase tracking-widest text-[#FF3D8A]">Qué se habló hoy</h2>
       <p className="mt-1 text-xs text-white/50">Lo que escriben las mesas y lo que responden los mozos.</p>
       {error && <p className="mt-2 text-xs text-red-300">{error}</p>}

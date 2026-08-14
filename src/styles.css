@@ -134,8 +134,8 @@
     overflow-x: hidden;
     -webkit-tap-highlight-color: color-mix(in oklab, var(--neon-pink) 25%, transparent);
     background-image:
-      radial-gradient(ellipse at 20% 0%, color-mix(in oklab, var(--neon-purple) 12%, transparent), transparent 55%),
-      radial-gradient(ellipse at 85% 15%, color-mix(in oklab, var(--neon-red) 8%, transparent), transparent 50%);
+      radial-gradient(ellipse at 20% 0%, color-mix(in oklab, #6B1D3A 14%, transparent), transparent 55%),
+      radial-gradient(ellipse at 85% 15%, color-mix(in oklab, #C4A35A 7%, transparent), transparent 50%);
     background-attachment: fixed;
   }
 
@@ -248,17 +248,17 @@
 
 /* Header base + scrolled variant */
 @utility site-header {
-  backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(120%);
   background:
     linear-gradient(
       90deg,
-      color-mix(in oklab, var(--neon-purple) 8%, transparent),
-      color-mix(in oklab, #FF3D8A 6%, transparent),
-      color-mix(in oklab, var(--neon-yellow) 7%, transparent)
+      color-mix(in oklab, #6B1D3A 18%, transparent),
+      color-mix(in oklab, #12080e 40%, transparent),
+      color-mix(in oklab, #C4A35A 10%, transparent)
     ),
-    color-mix(in oklab, var(--background) 28%, transparent);
+    color-mix(in oklab, var(--background) 42%, transparent);
   border-bottom: none;
-  box-shadow: 0 1px 0 color-mix(in oklab, var(--neon-purple) 35%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklab, #C4A35A 28%, transparent);
   transition: background 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease;
 }
 
@@ -266,13 +266,13 @@
   background:
     linear-gradient(
       90deg,
-      color-mix(in oklab, var(--neon-purple) 16%, transparent),
-      color-mix(in oklab, #FF3D8A 12%, transparent),
-      color-mix(in oklab, var(--neon-yellow) 14%, transparent)
+      color-mix(in oklab, #6B1D3A 28%, transparent),
+      color-mix(in oklab, #12080e 55%, transparent),
+      color-mix(in oklab, #C4A35A 16%, transparent)
     ),
-    color-mix(in oklab, var(--background) 82%, transparent);
+    color-mix(in oklab, var(--background) 86%, transparent);
   box-shadow:
-    0 1px 0 color-mix(in oklab, #FF3D8A 45%, transparent),
+    0 1px 0 color-mix(in oklab, #C4A35A 40%, transparent),
     0 8px 24px oklch(0 0 0 / 35%);
 }
 
@@ -384,47 +384,40 @@
 
 .katrina-wallpaper {
   background-color: #12080e;
-  background-image:
-    radial-gradient(circle at 12% 18%, color-mix(in oklab, #6B1D3A 22%, transparent), transparent 36%),
-    radial-gradient(circle at 88% 8%, color-mix(in oklab, #C4A35A 14%, transparent), transparent 32%),
-    radial-gradient(circle at 70% 80%, color-mix(in oklab, #1C1433 28%, transparent), transparent 30%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath d='M36 10c3 6 8 8 14 8-6 3-8 8-8 14-6-3-14-3-20 0 0-6-2-11-8-14 6 0 11-2 14-8z' fill='none' stroke='%23C4A35A' stroke-opacity='0.14' stroke-width='1'/%3E%3C/svg%3E");
-  background-size: auto, auto, auto, 72px 72px;
+  background-repeat: repeat;
+  background-size: 180px 180px;
 }
 
-.katrina-beams {
+.katrina-section-paper {
+  position: relative;
+  background-repeat: repeat;
+  background-size: 180px 180px;
+  border-block: 1px solid color-mix(in oklab, #C4A35A 22%, transparent);
+}
+
+.katrina-corner {
   position: absolute;
-  inset: -20%;
-  background: repeating-conic-gradient(
-    from 0deg at 50% 0%,
-    transparent 0deg 14deg,
-    color-mix(in oklab, #C4A35A 8%, transparent) 15deg 16deg,
-    transparent 17deg 29deg,
-    color-mix(in oklab, #6B1D3A 9%, transparent) 30deg 31deg
-  );
-  animation: katrina-beams-spin 48s linear infinite;
-  opacity: 0.28;
-  mask-image: radial-gradient(ellipse at 50% 0%, black 10%, transparent 62%);
+  width: 72px;
+  height: 72px;
+  pointer-events: none;
+  opacity: 0.82;
+}
+.katrina-corner-tl { top: 10px; left: 10px; }
+.katrina-corner-tr { top: 10px; right: 10px; transform: scaleX(-1); }
+.katrina-corner-bl { bottom: 10px; left: 10px; transform: scaleY(-1); }
+.katrina-corner-br { bottom: 10px; right: 10px; transform: scale(-1); }
+
+.katrina-frame {
+  position: relative;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, #C4A35A 22%, transparent),
+    0 0 24px color-mix(in oklab, #6B1D3A 18%, transparent);
 }
 
-@keyframes katrina-beams-spin {
-  to { transform: rotate(360deg); }
-}
-
-.tapiz-carta {
-  background:
-    linear-gradient(180deg, color-mix(in oklab, #6B1D3A 16%, transparent), transparent 22%, transparent 78%, color-mix(in oklab, #1C1433 14%, transparent)),
-    radial-gradient(ellipse at 50% 0%, color-mix(in oklab, #6B1D3A 18%, transparent), transparent 55%);
-}
-
-.tapiz-noches {
-  background:
-    linear-gradient(180deg, color-mix(in oklab, #1C1433 22%, transparent), transparent 42%);
-}
-
+.tapiz-carta,
+.tapiz-noches,
 .tapiz-lugar {
-  background:
-    linear-gradient(180deg, color-mix(in oklab, #C4A35A 14%, transparent), transparent 44%);
+  background-color: transparent;
 }
 
 @utility starfield-dot {
@@ -555,15 +548,13 @@
 @keyframes katrina-title-hue {
   0%, 100% {
     filter:
-      drop-shadow(0 0 6px rgba(255, 61, 138, 0.85))
-      drop-shadow(0 0 18px rgba(255, 61, 138, 0.5))
-      drop-shadow(0 0 34px rgba(255, 61, 138, 0.25));
+      drop-shadow(0 0 5px rgba(184, 36, 79, 0.55))
+      drop-shadow(0 0 16px rgba(196, 163, 90, 0.22));
   }
   50% {
     filter:
-      drop-shadow(0 0 6px rgba(232, 185, 35, 0.85))
-      drop-shadow(0 0 18px rgba(232, 185, 35, 0.5))
-      drop-shadow(0 0 34px rgba(232, 185, 35, 0.25));
+      drop-shadow(0 0 5px rgba(196, 163, 90, 0.55))
+      drop-shadow(0 0 16px rgba(184, 36, 79, 0.18));
   }
 }
 
@@ -571,15 +562,15 @@
   position: relative;
   background-image: linear-gradient(
     100deg,
-    #b8244f 0%,
-    #b8244f 38%,
-    #ff5aa0 46%,
-    #fff2c8 50%,
-    #ffcf5a 54%,
-    #b8244f 62%,
-    #b8244f 100%
+    #8a2040 0%,
+    #b8244f 36%,
+    #e8b923 48%,
+    #fff1c2 50%,
+    #c4a35a 54%,
+    #b8244f 66%,
+    #8a2040 100%
   );
-  background-size: 260% 100%;
+  background-size: 240% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;

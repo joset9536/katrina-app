@@ -12,7 +12,6 @@ import {
 } from "@/lib/mesa";
 import { ensureLlamado, type LlamadoRow } from "@/lib/pedido";
 import { enviarChat, getLlamado, listarChat, listarCola } from "@/lib/salon-bus";
-import { whatsappCallUrl } from "@/lib/whatsapp";
 
 type ChatMsg = {
   id: string;
@@ -241,14 +240,6 @@ export function ChatPanel() {
               <button type="submit" disabled={sending} className="mt-1 h-12 rounded-md bg-[#FF3D8A] px-4 text-sm font-semibold text-[#0E0A1A] active:scale-[0.99] disabled:opacity-50">
                 {sending ? "Llamando…" : "Llamar al mozo"}
               </button>
-              <a
-                href={whatsappCallUrl({ mesa: hasValidMesa ? numero : mesaInput || null, nombre: usuario })}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-11 rounded-md border border-white/20 px-4 text-center text-sm leading-[2.75rem] text-white/80"
-              >
-                Si no anda, WhatsApp
-              </a>
             </form>
           ) : (
             <>

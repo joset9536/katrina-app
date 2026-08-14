@@ -7,6 +7,7 @@ import { MenuGrid } from "@/components/katrina/MenuGrid";
 import { SiteFooter } from "@/components/katrina/SiteFooter";
 import { StarField } from "@/components/katrina/StarField";
 import { Wallpaper } from "@/components/katrina/Wallpaper";
+import { SectionPaper } from "@/components/katrina/SectionPaper";
 import { ChatPanel } from "@/components/katrina/ChatPanel";
 import { MobileBottomBar } from "@/components/katrina/MobileBottomBar";
 import { MesaBanner } from "@/components/katrina/MesaBanner";
@@ -28,15 +29,15 @@ function Index() {
         <MesaBanner />
         <main>
           <Hero />
-          <div className="tapiz-carta">
+          <SectionPaper variant="carta">
             <MenuGrid />
-          </div>
-          <div className="tapiz-noches">
+          </SectionPaper>
+          <SectionPaper variant="noches">
             <Eventos />
-          </div>
-          <div className="tapiz-lugar">
+          </SectionPaper>
+          <SectionPaper variant="lugar">
             <Identidad />
-          </div>
+          </SectionPaper>
         </main>
         <SiteFooter />
       </div>

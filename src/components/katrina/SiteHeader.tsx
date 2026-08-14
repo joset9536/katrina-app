@@ -78,7 +78,7 @@ export function SiteHeader() {
           </button>
           <a href="#inicio" className="hidden min-w-0 items-center gap-3 sm:flex">
             <span className="header-katrina-mark truncate" aria-label="Katrina">
-              <span className="katrina-title">KATRINA</span>
+              <span className="katrina-title-calm">KATRINA</span>
             </span>
           </a>
         </div>

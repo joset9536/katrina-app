@@ -45,7 +45,7 @@ export function Eventos() {
           {NOCHES.map((n) => (
             <article
               key={n.title}
-              className="overflow-hidden rounded-xl border border-white/10 bg-black/40"
+              className="overflow-hidden rounded-xl border border-[#C4A35A]/25 bg-black/45 shadow-[0_0_18px_rgba(196,163,90,0.12)]"
             >
               <div className="aspect-[4/3] w-full overflow-hidden">
                 <img src={n.src} alt={n.title} className="h-full w-full object-cover" loading="lazy" />

@@ -10,16 +10,24 @@ import musicaVivo from "@/assets/local/musica-vivo.jpg";
 import picadaMesa from "@/assets/local/picada-mesa.jpg";
 import qrMesa from "@/assets/local/qr-mesa.jpg";
 import detalleVasos from "@/assets/local/detalle-vasos.jpg";
+import patio01 from "@/assets/patio/patio-01.png";
+import patio02 from "@/assets/patio/patio-02.png";
+import patio03 from "@/assets/patio/patio-03.png";
+import patio04 from "@/assets/patio/patio-04.png";
 
 const BORDER_COLORS = ["#FF3D8A", "#E8B923", "#8B5CF6", "#74ACDF"];
 
 const PHOTOS = [
   { src: salonMesas, label: "Salón" },
+  { src: patio01, label: "El salón de noche" },
   { src: barraNoche, label: "Barra" },
+  { src: patio02, label: "Ambiente" },
   { src: genteBrindis, label: "La mesa" },
   { src: picadaMesa, label: "Picada" },
   { src: musicaVivo, label: "Música" },
+  { src: patio03, label: "Segundo piso" },
   { src: qrMesa, label: "Pedido por QR" },
+  { src: patio04, label: "Entrada" },
   { src: detalleVasos, label: "Tragos" },
 ];
 

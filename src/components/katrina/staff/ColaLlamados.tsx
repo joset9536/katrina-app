@@ -25,6 +25,7 @@ export function ColaLlamados({ staffNombre }: { staffNombre: string }) {
   const [filter, setFilter] = useState<"todos" | "urgentes">("todos");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const seenRef = useRef<Set<string>>(new Set());
   const primed = useRef(false);
 
@@ -32,7 +33,10 @@ export function ColaLlamados({ staffNombre }: { staffNombre: string }) {
     const load = async () => {
       const res = await listarCola();
       const next = (res.items as Llamado[]) || [];
-      if (!res.error) {
+      if (res.error) {
+        setError(res.error);
+      } else {
+        setError(null);
         if (primed.current) {
           const newcomers = next.filter((l) => !seenRef.current.has(l.id));
           if (newcomers.length) playCallBeep();
@@ -93,6 +97,7 @@ export function ColaLlamados({ staffNombre }: { staffNombre: string }) {
           ))}
         </div>
       </div>
+      {error && <p className="mb-2 text-xs text-red-300">{error}</p>}
       {loading ? (
         <p className="text-xs text-white/40">Cargando llamados…</p>
       ) : visible.length === 0 ? (

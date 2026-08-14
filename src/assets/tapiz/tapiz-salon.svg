@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <defs>
+    <pattern id="damask" width="180" height="180" patternUnits="userSpaceOnUse">
+      <rect width="180" height="180" fill="#14080d"/>
+      <g fill="none" stroke="#7a4a1c" stroke-width="0.7" opacity="0.45">
+        <path d="M90 18c8 16 22 22 38 22-16 8-22 22-22 38-16-8-38-8-54 0 0-16-6-30-22-38 16 0 30-6 38-22z"/>
+        <path d="M0 18c8 16 22 22 38 22C22 48 16 62 16 78c-16-8-38-8-54 0 0-16-6-30-22-38 16 0 30-6 38-22z" transform="translate(0 0)"/>
+        <path d="M180 18c8 16 22 22 38 22-16 8-22 22-22 38-16-8-38-8-54 0 0-16-6-30-22-38 16 0 30-6 38-22z" transform="translate(-180 0)"/>
+        <path d="M90 198c8 16 22 22 38 22-16 8-22 22-22 38-16-8-38-8-54 0 0-16-6-30-22-38 16 0 30-6 38-22z" transform="translate(0 -180)"/>
+        <circle cx="0" cy="0" r="10"/>
+        <circle cx="180" cy="0" r="10"/>
+        <circle cx="0" cy="180" r="10"/>
+        <circle cx="180" cy="180" r="10"/>
+        <circle cx="90" cy="90" r="22"/>
+        <path d="M90 68c6 8 14 12 22 12-8 6-12 14-12 22-8-6-22-6-32 0 0-8-4-16-12-22 8 0 16-4 22-12z"/>
+        <path d="M0 90h36M144 90h36M90 0v36M90 144v36"/>
+      </g>
+      <g fill="#c4a35a" opacity="0.14">
+        <circle cx="90" cy="90" r="2.2"/>
+        <circle cx="0" cy="0" r="1.6"/>
+        <circle cx="180" cy="0" r="1.6"/>
+        <circle cx="0" cy="180" r="1.6"/>
+        <circle cx="180" cy="180" r="1.6"/>
+      </g>
+    </pattern>
+  </defs>
+  <rect width="180" height="180" fill="url(#damask)"/>
+</svg>
