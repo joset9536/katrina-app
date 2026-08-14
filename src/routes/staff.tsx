@@ -4,6 +4,7 @@ import { ColaLlamados } from "@/components/katrina/staff/ColaLlamados";
 import { MisLlamados } from "@/components/katrina/staff/MisLlamados";
 import { MapaMesasRef } from "@/components/katrina/staff/MapaMesasRef";
 import { PinGate } from "@/components/katrina/PinGate";
+import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const STAFF_PIN = import.meta.env.VITE_STAFF_PIN || process.env.STAFF_PIN || "1234";
@@ -106,24 +107,41 @@ function StaffPage() {
           <h1 className="text-lg font-semibold text-[#FF3D8A]">Panel Staff</h1>
           <p className="text-[11px] text-white/50">Turno de {nombre}</p>
         </div>
-        <button
-          onClick={async () => {
-            await cerrarTurno(turnoId);
-            localStorage.removeItem(STORAGE);
-            localStorage.removeItem(STORAGE_TURNO);
-            setNombre("");
-            setTurnoId(null);
-          }}
-          className="text-xs text-white/60 hover:text-white"
-        >
-          Cerrar turno
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={async () => {
+              await cerrarTurno(turnoId);
+              localStorage.removeItem(STORAGE);
+              localStorage.removeItem(STORAGE_TURNO);
+              setNombre("");
+              setTurnoId(null);
+            }}
+            className="h-11 rounded-md px-3 text-xs text-white/60 hover:text-white"
+          >
+            Cerrar turno
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              await cerrarTurno(turnoId);
+              localStorage.removeItem(STORAGE);
+              localStorage.removeItem(STORAGE_TURNO);
+              localStorage.removeItem("katrina_staff_pin_ok");
+              window.location.reload();
+            }}
+            className="h-11 rounded-md px-3 text-xs text-white/60 hover:text-white"
+          >
+            Salir
+          </button>
+        </div>
       </header>
       <main className="mx-auto grid max-w-6xl gap-4 p-4 md:p-6">
         <ColaLlamados staffNombre={nombre} />
         <MisLlamados staffNombre={nombre} />
         <MapaMesasRef staffNombre={nombre} />
       </main>
+      <Toaster />
     </div>
   );
 }

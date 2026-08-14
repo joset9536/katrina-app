@@ -1,9 +1,11 @@
 import { NeonButton } from "./NeonButton";
 import { useInView } from "@/hooks/use-in-view";
 import { whatsappOrderUrl } from "@/lib/whatsapp";
+import { useMesa } from "@/hooks/use-mesa";
 
 export function Hero() {
   const { ref, visible } = useInView<HTMLDivElement>({ threshold: 0.1 });
+  const { hasValidMesa, numero } = useMesa();
 
   return (
     <section
@@ -27,22 +29,24 @@ export function Hero() {
 
           <div className="hero-tag-box mt-5">
             <p className="hero-tag-line">
-              El punto de encuentro nocturno de Orán. Coctelería, cocina de autor y ritual argentino.
+              {hasValidMesa
+                ? `Mesa ${numero}. Mirá la carta, agregá lo que quieras y llamá al mozo.`
+                : "El punto de encuentro nocturno de Orán. Hamburguesas, pizzas, picadas y tragos. Egüés 517."}
             </p>
           </div>
 
           <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row">
+            <NeonButton href="#carta" variant="primary" className="btn-pulse min-h-12">
+              {hasValidMesa ? "Ver carta de mi mesa" : "Ver Carta"}
+            </NeonButton>
             <NeonButton
               href={whatsappOrderUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              variant="primary"
-              className="btn-pulse"
+              variant="ghost"
+              className="btn-pulse min-h-12"
             >
-              Pedir a mi Mesa
-            </NeonButton>
-            <NeonButton href="#carta" variant="ghost" className="btn-pulse">
-              Ver Carta
+              WhatsApp
             </NeonButton>
           </div>
         </div>

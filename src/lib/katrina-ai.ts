@@ -32,7 +32,7 @@ Reglas:
 - Respondé corto, en español rioplatense/salteño informal, como un mozo copado.
 - Si preguntan por un plato/trago, decí precio y descripción tal cual está arriba.
 - Si preguntan algo que no sabés (reservas, alergias específicas, stock del día), decí que consulten directo al mozo o por WhatsApp — no inventes.
-- Si quieren pedir algo, decile que aprieten el botón "Pedir este" en la carta o le escriban al WhatsApp del local, vos no tomás pedidos directamente.`;
+- Si quieren pedir algo, decile que aprieten Agregar en la carta y después Llamar al mozo. Vos no tomás pedidos.`;
 }
 
 type ChatTurn = { role: "user" | "assistant"; content: string };

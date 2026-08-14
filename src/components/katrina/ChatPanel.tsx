@@ -1,10 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bot, MessageCircle, Send, X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { isSupabaseConfigured, supabase } from "@/integrations/supabase/client";
 import { whatsappOrderUrl } from "@/lib/whatsapp";
 import { askKatrinaAi } from "@/lib/katrina-ai";
-import { onOrderRequested } from "@/lib/order-bridge";
-import { logToSheets } from "@/lib/sheets-log";
+import { useMesa } from "@/hooks/use-mesa";
+import { useOnline } from "@/hooks/use-online";
+import {
+  persistMesa,
+  persistUser,
+  parseMesaValue,
+  readStoredUser,
+  STORAGE_LLAMADO,
+} from "@/lib/mesa";
+import { ensureLlamado, type LlamadoRow } from "@/lib/pedido";
 
 type AiTurn = { role: "user" | "assistant"; content: string };
 
@@ -17,71 +26,48 @@ type ChatMsg = {
   created_at: string;
 };
 
-type Llamado = {
-  id: string;
-  mesa_id: string;
-  cliente_nombre: string;
-  timestamp: string;
-  prioridad: number;
-  staff_asignado: string | null;
-  status: string;
-};
-
-const STORAGE_USER = "katrina_chat_user";
-const STORAGE_MESA = "katrina_chat_mesa";
-const STORAGE_LLAMADO = "katrina_chat_llamado";
-
 export function ChatPanel() {
+  const { active, numero, mesaId, queryError, hasValidMesa } = useMesa();
+  const online = useOnline();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"ai" | "mozo">("mozo");
-  const [pendingOrder, setPendingOrder] = useState<string | null>(null);
   const [aiMessages, setAiMessages] = useState<AiTurn[]>([]);
   const [aiInput, setAiInput] = useState("");
   const [aiSending, setAiSending] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [usuario, setUsuario] = useState("");
-  const [mesa, setMesa] = useState("");
+  const [mesaInput, setMesaInput] = useState("");
   const [ready, setReady] = useState(false);
   const [sending, setSending] = useState(false);
   const [llamadoId, setLlamadoId] = useState<string | null>(null);
-  const [llamado, setLlamado] = useState<Llamado | null>(null);
-  const [queue, setQueue] = useState<Llamado[]>([]);
+  const [llamado, setLlamado] = useState<LlamadoRow | null>(null);
+  const [queue, setQueue] = useState<LlamadoRow[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const parsedInput = parseMesaValue(mesaInput);
+  const resolvedMesaId = hasValidMesa ? mesaId || "" : parsedInput.ok ? parsedInput.mesaId : "";
 
-  // Restore identity + mesa via ?mesa=
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const mesaParam = params.get("mesa") || "";
-    const storedMesa = localStorage.getItem(STORAGE_MESA) || "";
-    const u = localStorage.getItem(STORAGE_USER) || "";
-    const m = mesaParam || storedMesa;
-
-    // Si el cliente escanea el QR de OTRA mesa (se cambio de lugar, o es el
-    // QR de un amigo), no arrastramos el llamado viejo de la mesa anterior —
-    // sino se mezcla el estado de una mesa con el chat de otra.
-    const mesaChanged = Boolean(mesaParam && storedMesa && mesaParam !== storedMesa);
-    if (mesaChanged) {
-      localStorage.removeItem(STORAGE_LLAMADO);
-      localStorage.setItem(STORAGE_MESA, mesaParam);
-    }
-    const l = mesaChanged ? null : localStorage.getItem(STORAGE_LLAMADO);
-
+    const u = readStoredUser();
+    const l = localStorage.getItem(STORAGE_LLAMADO);
     setUsuario(u);
-    setMesa(m);
+    if (hasValidMesa) setMesaInput(String(numero));
     setLlamadoId(l);
-    setReady(Boolean(u && m));
+    setReady(Boolean(u && hasValidMesa));
+  }, [hasValidMesa, numero]);
+
+  useEffect(() => {
+    const openChat = () => setOpen(true);
+    window.addEventListener("katrina:open-chat", openChat);
+    return () => window.removeEventListener("katrina:open-chat", openChat);
   }, []);
 
-  const mesaKey = mesa ? `mesa-${mesa}` : "";
+  const mesaKey = resolvedMesaId || (hasValidMesa ? mesaId : "") || "";
 
-  // Load messages + subscribe
   useEffect(() => {
-    if (!open || !ready) return;
-    let active = true;
-
-    // Solo mensajes de las ultimas 12hs: el chat es por mesa, no por cliente,
-    // asi que sin este corte un cliente nuevo veria la charla de mesas anteriores.
+    if (!open || !ready || !mesaKey || !isSupabaseConfigured()) return;
+    let activeSub = true;
     const cutoff = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
 
     supabase
@@ -91,8 +77,10 @@ export function ChatPanel() {
       .gte("created_at", cutoff)
       .order("created_at", { ascending: true })
       .limit(100)
-      .then(({ data }) => {
-        if (active && data) setMessages(data as ChatMsg[]);
+      .then(({ data, error }) => {
+        if (!activeSub) return;
+        if (error) setLoadError("No se pudieron cargar los mensajes.");
+        else setMessages((data as ChatMsg[]) || []);
       });
 
     const channel = supabase
@@ -111,46 +99,40 @@ export function ChatPanel() {
       .subscribe();
 
     return () => {
-      active = false;
+      activeSub = false;
       supabase.removeChannel(channel);
     };
   }, [open, ready, mesaKey]);
 
-  // Subscribe to llamados queue (for position + own state)
   useEffect(() => {
-    if (!ready) return;
-    let active = true;
+    if (!ready || !isSupabaseConfigured()) return;
+    let activeSub = true;
 
     const load = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("llamados")
         .select("*")
         .eq("status", "en_espera")
         .order("prioridad", { ascending: false })
         .order("timestamp", { ascending: true });
-      if (active && data) setQueue(data as Llamado[]);
+      if (!activeSub) return;
+      if (error) setLoadError("No se pudo actualizar el estado del llamado.");
+      if (data) setQueue(data as LlamadoRow[]);
 
       if (llamadoId) {
-        const { data: mine } = await supabase
-          .from("llamados")
-          .select("*")
-          .eq("id", llamadoId)
-          .maybeSingle();
-        if (active) setLlamado((mine as Llamado) || null);
+        const { data: mine } = await supabase.from("llamados").select("*").eq("id", llamadoId).maybeSingle();
+        if (activeSub) setLlamado((mine as LlamadoRow) || null);
       }
     };
     load();
-
+    const poll = window.setInterval(load, 8000);
     const ch = supabase
       .channel("llamados-client")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "llamados" },
-        () => load(),
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "llamados" }, () => load())
       .subscribe();
     return () => {
-      active = false;
+      activeSub = false;
+      window.clearInterval(poll);
       supabase.removeChannel(ch);
     };
   }, [ready, llamadoId]);
@@ -165,49 +147,19 @@ export function ChatPanel() {
     return idx >= 0 ? idx + 1 : null;
   }, [queue, llamadoId, llamado]);
 
-  const createLlamado = async (cliente: string, mesaId: string) => {
-    // Si otro celular de la MISMA mesa ya esta esperando o siendo atendido,
-    // nos sumamos a ese llamado en vez de crear uno duplicado en la cola
-    // (una mesa con 5 amigos no son 5 llamados distintos).
-    const { data: existing } = await supabase
-      .from("llamados")
-      .select("*")
-      .eq("mesa_id", mesaId)
-      .in("status", ["en_espera", "atendido"])
-      .order("timestamp", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (existing) {
-      setLlamadoId(existing.id);
-      localStorage.setItem(STORAGE_LLAMADO, existing.id);
-      setLlamado(existing as Llamado);
-      return;
-    }
-
-    const { data } = await supabase
-      .from("llamados")
-      .insert({ mesa_id: mesaId, cliente_nombre: cliente, status: "en_espera", prioridad: 0 })
-      .select()
-      .single();
-    if (data) {
-      setLlamadoId(data.id);
-      localStorage.setItem(STORAGE_LLAMADO, data.id);
-      logToSheets({
-        data: {
-          timestamp: new Date().toISOString(),
-          mesa: mesaId,
-          cliente,
-          mensaje: "Llamó al mozo",
-        },
-      }).catch(() => {});
-    }
-    await supabase.from("mesas").update({ estado: "ocupada" }).eq("id", mesaId);
-  };
-
   const sendText = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || sending) return false;
+    if (!online) {
+      toast.error("Sin internet. El mensaje no salió.");
+      return false;
+    }
+    if (!isSupabaseConfigured()) {
+      toast.error("El sistema de mesas no está conectado.");
+      return false;
+    }
     setSending(true);
+    setLoadError(null);
     const isUrgente = /urgente/i.test(trimmed);
     const { error } = await supabase.from("chat").insert({
       mensaje: trimmed,
@@ -215,21 +167,32 @@ export function ChatPanel() {
       mesa_id: mesaKey,
       tipo: "cliente",
     });
-    logToSheets({
-      data: { timestamp: new Date().toISOString(), mesa: mesaKey, cliente: usuario, mensaje: trimmed },
-    }).catch(() => {});
+    if (error) {
+      setSending(false);
+      toast.error("No se pudo enviar. Probá de nuevo.");
+      return false;
+    }
 
+    if (llamado && (llamado.status === "resuelto" || llamado.status === "abandonado")) {
+      const created = await ensureLlamado(usuario, mesaKey);
+      if (created.llamado) {
+        setLlamadoId(created.llamado.id);
+        localStorage.setItem(STORAGE_LLAMADO, created.llamado.id);
+        setLlamado(created.llamado);
+      }
+    } else if (!llamadoId) {
+      const created = await ensureLlamado(usuario, mesaKey);
+      if (created.llamado) {
+        setLlamadoId(created.llamado.id);
+        localStorage.setItem(STORAGE_LLAMADO, created.llamado.id);
+        setLlamado(created.llamado);
+      }
+    }
     if (isUrgente && llamadoId) {
       await supabase.from("llamados").update({ prioridad: 1 }).eq("id", llamadoId);
     }
-    // Reabrir llamado si estaba resuelto/abandonado
-    if (llamado && (llamado.status === "resuelto" || llamado.status === "abandonado")) {
-      await createLlamado(usuario, mesaKey);
-    } else if (!llamadoId) {
-      await createLlamado(usuario, mesaKey);
-    }
     setSending(false);
-    return !error;
+    return true;
   };
 
   const send = async () => {
@@ -238,37 +201,36 @@ export function ChatPanel() {
     if (ok) setInput("");
   };
 
-  // "Pedir este" en la carta dispara este evento en vez de ir directo a
-  // WhatsApp — asi el pedido entra al mismo sistema en vivo que ve /staff.
-  useEffect(() => {
-    return onOrderRequested((text) => {
-      setOpen(true);
-      setMode("mozo");
-      if (ready) {
-        sendText(text);
-      } else {
-        setPendingOrder(text);
-      }
-    });
-  }, [ready, usuario, mesaKey, llamadoId, llamado]);
-
   const saveIdentity = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!online) {
+      toast.error("Sin internet. No se puede llamar al mozo.");
+      return;
+    }
     const u = usuario.trim();
-    const m = mesa.trim();
-    if (!u || !m) return;
-    localStorage.setItem(STORAGE_USER, u);
-    localStorage.setItem(STORAGE_MESA, m);
+    const parsed = hasValidMesa ? active : parseMesaValue(mesaInput);
+    if (!u) {
+      toast.error("Escribí tu nombre.");
+      return;
+    }
+    if (!parsed.ok) {
+      toast.error(queryError || "Esa mesa no existe. Pedile el QR al mozo.");
+      return;
+    }
+    persistUser(u);
+    persistMesa(parsed.numero);
     setReady(true);
-    await createLlamado(u, `mesa-${m}`);
-    if (pendingOrder) {
-      await supabase.from("chat").insert({
-        mensaje: pendingOrder,
-        usuario: u,
-        mesa_id: `mesa-${m}`,
-        tipo: "cliente",
-      });
-      setPendingOrder(null);
+    const created = await ensureLlamado(u, parsed.mesaId);
+    if (created.error) {
+      toast.error(created.error.includes("foreign key") ? "Esa mesa no existe." : created.error);
+      setReady(false);
+      return;
+    }
+    if (created.llamado) {
+      setLlamadoId(created.llamado.id);
+      localStorage.setItem(STORAGE_LLAMADO, created.llamado.id);
+      setLlamado(created.llamado);
+      toast.success("Llamado enviado. El mozo ya lo ve.");
     }
   };
 
@@ -277,15 +239,14 @@ export function ChatPanel() {
     if (!question || aiSending) return;
     setAiSending(true);
     setAiInput("");
-    const history = aiMessages;
     setAiMessages((prev) => [...prev, { role: "user", content: question }]);
     try {
-      const res = await askKatrinaAi({ data: { question, mesa: mesa || undefined, history } });
+      const res = await askKatrinaAi({ data: { question, mesa: numero ? String(numero) : undefined, history: aiMessages } });
       setAiMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
     } catch {
       setAiMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "No me pude conectar ahora. Escribinos por WhatsApp mientras tanto." },
+        { role: "assistant", content: "No me pude conectar ahora. Llamá al mozo o escribinos por WhatsApp." },
       ]);
     }
     setAiSending(false);
@@ -294,60 +255,56 @@ export function ChatPanel() {
   const statusLabel = () => {
     if (!llamado) return null;
     if (llamado.status === "atendido")
-      return `👋 Te está atendiendo ${llamado.staff_asignado ?? "el staff"}`;
-    if (llamado.status === "resuelto") return "✅ Llamada resuelta. Escribí si necesitás algo más.";
-    if (llamado.status === "abandonado") return "⏱️ Llamada expirada. Volvé a escribir para llamar.";
-    if (position) {
-      const eta = Math.max(1, position * 2);
-      return `✓ En cola · posición #${position} · ~${eta} min`;
-    }
-    return "✓ Llamada enviada";
+      return `Te está atendiendo ${llamado.staff_asignado ?? "el staff"}`;
+    if (llamado.status === "resuelto") return "Llamada resuelta. Escribí si necesitás algo más.";
+    if (llamado.status === "abandonado") return "Llamada expirada. Volvé a escribir para llamar.";
+    if (position) return `En cola · posición #${position}`;
+    return "Llamada enviada";
   };
 
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Abrir chat con el staff"
-        className="fixed bottom-24 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-[#FF3D8A]/60 bg-[#0E0A1A]/90 text-[#FF3D8A] shadow-[0_0_24px_rgba(255,61,138,0.55)] transition hover:scale-105 hover:shadow-[0_0_32px_rgba(255,61,138,0.85)] md:bottom-6 md:right-6"
+        className="fixed bottom-24 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full border border-[#FF3D8A]/60 bg-[#0E0A1A]/90 text-[#FF3D8A] shadow-[0_0_24px_rgba(255,61,138,0.55)] transition active:scale-95 md:bottom-6 md:right-6"
       >
         {open ? <X size={22} /> : <MessageCircle size={24} />}
       </button>
 
       {open && (
-        <div className="fixed bottom-44 right-4 z-50 flex h-[65vh] max-h-[560px] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-[#8B5CF6]/50 bg-[#0E0A1A]/95 shadow-[0_0_40px_rgba(139,92,246,0.35)] backdrop-blur-md animate-fade-in md:bottom-24 md:right-6 md:h-[70vh]">
+        <div className="fixed bottom-44 right-4 z-50 flex h-[65vh] max-h-[560px] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-[#8B5CF6]/50 bg-[#0E0A1A]/95 shadow-[0_0_40px_rgba(139,92,246,0.35)] backdrop-blur-md md:bottom-24 md:right-6 md:h-[70vh]">
           <header className="border-b border-white/10">
             <div className="flex items-center justify-between px-4 pt-3">
-              <p className="text-sm font-semibold text-[#FF3D8A]">Katrina Chat</p>
-              <button
-                onClick={() => setOpen(false)}
-                className="text-white/60 hover:text-white"
-                aria-label="Cerrar chat"
-              >
+              <p className="text-sm font-semibold text-[#FF3D8A]">Katrina · mesa</p>
+              <button type="button" onClick={() => setOpen(false)} className="flex h-11 w-11 items-center justify-center text-white/60" aria-label="Cerrar chat">
                 <X size={18} />
               </button>
             </div>
             <div className="flex gap-1 px-3 pb-2 pt-2">
               <button
+                type="button"
                 onClick={() => setMode("mozo")}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  mode === "mozo" ? "bg-[#FF3D8A] text-[#0E0A1A]" : "text-white/50 hover:text-white"
+                className={`flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-medium active:scale-95 ${
+                  mode === "mozo" ? "bg-[#FF3D8A] text-[#0E0A1A]" : "text-white/50"
                 }`}
               >
                 <MessageCircle size={14} /> Llamar mozo
               </button>
               <button
+                type="button"
                 onClick={() => setMode("ai")}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  mode === "ai" ? "bg-[#8B5CF6] text-white" : "text-white/50 hover:text-white"
+                className={`flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-medium active:scale-95 ${
+                  mode === "ai" ? "bg-[#8B5CF6] text-white" : "text-white/50"
                 }`}
               >
-                <Bot size={14} /> Asistente
+                <Bot size={14} /> Carta
               </button>
             </div>
             {ready && mode === "mozo" && (
               <p className="px-4 pb-2 text-[10px] uppercase tracking-widest text-white/50">
-                Mesa {mesa} · {usuario}
+                Mesa {numero ?? mesaInput} · {usuario}
               </p>
             )}
           </header>
@@ -357,7 +314,7 @@ export function ChatPanel() {
               <div className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
                 {aiMessages.length === 0 && (
                   <p className="mt-8 text-center text-xs text-white/40">
-                    🤖 Preguntame por horarios, direccion o algun plato/trago de la carta.
+                    Preguntame por horarios, dirección o un plato de la carta. No invento precios que no estén cargados.
                   </p>
                 )}
                 {aiMessages.map((m, i) => (
@@ -365,11 +322,7 @@ export function ChatPanel() {
                     <span className="text-[10px] uppercase tracking-wider text-white/40">
                       {m.role === "user" ? "Vos" : "Asistente"}
                     </span>
-                    <div
-                      className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                        m.role === "user" ? "bg-[#FF3D8A] text-[#0E0A1A]" : "bg-[#8B5CF6]/90 text-white"
-                      }`}
-                    >
+                    <div className={`max-w-[85%] break-words rounded-2xl px-3 py-2 text-sm ${m.role === "user" ? "bg-[#FF3D8A] text-[#0E0A1A]" : "bg-[#8B5CF6]/90 text-white"}`}>
                       {m.content}
                     </div>
                   </div>
@@ -388,40 +341,22 @@ export function ChatPanel() {
                   value={aiInput}
                   onChange={(e) => setAiInput(e.target.value)}
                   placeholder="Preguntame algo…"
-                  className="flex-1 rounded-full border border-white/15 bg-black/40 px-4 py-2 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none"
+                  className="h-11 flex-1 rounded-full border border-white/15 bg-black/40 px-4 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none"
                   maxLength={300}
                 />
-                <button
-                  type="submit"
-                  disabled={aiSending || !aiInput.trim()}
-                  aria-label="Preguntar"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#8B5CF6] text-white transition hover:bg-[#a078f7] disabled:opacity-40"
-                >
+                <button type="submit" disabled={aiSending || !aiInput.trim()} aria-label="Preguntar" className="flex h-11 w-11 items-center justify-center rounded-full bg-[#8B5CF6] text-white disabled:opacity-40">
                   <Send size={16} />
                 </button>
               </form>
             </>
           ) : !ready ? (
             <form onSubmit={saveIdentity} className="flex flex-1 flex-col justify-center gap-3 px-5">
-              {pendingOrder ? (
-                <p className="rounded-md border border-[#FF3D8A]/40 bg-[#FF3D8A]/10 px-3 py-2 text-xs text-white/80">
-                  Vas a pedir: <span className="font-semibold">{pendingOrder.replace("Quiero pedir: ", "")}</span>
-                  <br />
-                  Decinos tu nombre y confirmá la mesa para mandarlo.
-                </p>
-              ) : (
-                <p className="text-xs text-white/70">
-                  Contanos tu nombre y en qué mesa estás para llamar al staff.
-                </p>
-              )}
+              {!online && <p className="rounded-md border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">Sin internet. No se puede llamar al mozo.</p>}
+              {queryError && <p className="rounded-md border border-red-400/40 bg-red-500/10 px-3 py-2 text-xs text-red-100">{queryError}</p>}
+              <p className="text-xs text-white/70">Nombre y mesa para llamar al staff.</p>
               <p className="text-[11px] text-white/40">
-                Para una atención más personal, también podés escribirnos directo por{" "}
-                <a
-                  href={whatsappOrderUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#FF3D8A] underline"
-                >
+                Si preferís, escribinos por{" "}
+                <a href={whatsappOrderUrl()} target="_blank" rel="noopener noreferrer" className="text-[#FF3D8A] underline">
                   WhatsApp
                 </a>
                 .
@@ -430,20 +365,19 @@ export function ChatPanel() {
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value)}
                 placeholder="Tu nombre"
-                className="rounded-md border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none"
+                className="h-11 rounded-md border border-white/15 bg-black/40 px-3 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none"
                 maxLength={40}
               />
               <input
-                value={mesa}
-                onChange={(e) => setMesa(e.target.value)}
+                value={hasValidMesa ? String(numero) : mesaInput}
+                onChange={(e) => setMesaInput(e.target.value)}
                 placeholder="Número de mesa (1-30)"
-                className="rounded-md border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none"
+                readOnly={hasValidMesa}
+                className="h-11 rounded-md border border-white/15 bg-black/40 px-3 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none read-only:opacity-70"
                 maxLength={3}
+                inputMode="numeric"
               />
-              <button
-                type="submit"
-                className="mt-2 rounded-md bg-[#FF3D8A] px-4 py-2 text-sm font-semibold text-[#0E0A1A] hover:bg-[#ff5c9d]"
-              >
+              <button type="submit" disabled={!online} className="mt-2 h-12 rounded-md bg-[#FF3D8A] px-4 text-sm font-semibold text-[#0E0A1A] active:scale-[0.99] disabled:opacity-50">
                 Llamar al staff
               </button>
             </form>
@@ -451,38 +385,28 @@ export function ChatPanel() {
             <>
               <div className="border-b border-white/10 px-4 py-2 text-[11px]">
                 <p className="text-white/80">{statusLabel()}</p>
+                {loadError && <p className="mt-1 text-red-300">{loadError}</p>}
                 {llamado?.status === "en_espera" && llamado.prioridad !== 1 && (
                   <p className="mt-1 text-white/40">
-                    Si es urgente escribí <span className="text-[#FF3D8A]">URGENTE</span> en el chat.
+                    Si es urgente escribí <span className="text-[#FF3D8A]">URGENTE</span>.
                   </p>
                 )}
               </div>
               <div className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
                 {messages.length === 0 && (
-                  <p className="mt-8 text-center text-xs text-white/40">
-                    Todavía no hay mensajes. Escribí algo 👇
-                  </p>
+                  <p className="mt-8 text-center text-xs text-white/40">Todavía no hay mensajes. Escribí algo o mandá el pedido desde la carta.</p>
                 )}
                 {messages.map((m) => {
                   const mine = m.usuario === usuario && m.tipo === "cliente";
                   const isStaff = m.tipo === "staff";
                   return (
-                    <div
-                      key={m.id}
-                      className={`flex flex-col ${mine ? "items-end" : "items-start"}`}
-                    >
+                    <div key={m.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
                       <span className="text-[10px] uppercase tracking-wider text-white/40">
                         {isStaff ? `Staff${m.usuario ? ` · ${m.usuario}` : ""}` : m.usuario}
                       </span>
-                      <div
-                        className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                          mine
-                            ? "bg-[#FF3D8A] text-[#0E0A1A]"
-                            : isStaff
-                              ? "bg-[#8B5CF6]/90 text-white"
-                              : "bg-white/10 text-white"
-                        }`}
-                      >
+                      <div className={`max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3 py-2 text-sm ${
+                        mine ? "bg-[#FF3D8A] text-[#0E0A1A]" : isStaff ? "bg-[#8B5CF6]/90 text-white" : "bg-white/10 text-white"
+                      }`}>
                         {m.mensaje}
                       </div>
                     </div>
@@ -490,7 +414,6 @@ export function ChatPanel() {
                 })}
                 <div ref={bottomRef} />
               </div>
-
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -501,16 +424,12 @@ export function ChatPanel() {
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Escribí un mensaje…"
-                  className="flex-1 rounded-full border border-white/15 bg-black/40 px-4 py-2 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none"
+                  placeholder={online ? "Escribí un mensaje…" : "Sin internet"}
+                  disabled={!online}
+                  className="h-11 flex-1 rounded-full border border-white/15 bg-black/40 px-4 text-sm text-white placeholder-white/40 focus:border-[#FF3D8A] focus:outline-none"
                   maxLength={500}
                 />
-                <button
-                  type="submit"
-                  disabled={sending || !input.trim()}
-                  aria-label="Enviar"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FF3D8A] text-[#0E0A1A] transition hover:bg-[#ff5c9d] disabled:opacity-40"
-                >
+                <button type="submit" disabled={sending || !input.trim() || !online} aria-label="Enviar" className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FF3D8A] text-[#0E0A1A] disabled:opacity-40">
                   <Send size={16} />
                 </button>
               </form>

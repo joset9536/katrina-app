@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MessageCircle } from "lucide-react";
 import { useInView } from "@/hooks/use-in-view";
-import { requestOrder } from "@/lib/order-bridge";
 import { MenuSwiper, type FlatMenuItem } from "./MenuSwiper";
+import { ItemOrderControls } from "./ItemOrderControls";
 
 
 import classicBurgerAsset from "@/assets/carta/classic-burger.jpg";
@@ -11,8 +10,7 @@ import dobleBurgerAsset from "@/assets/carta/doble-burger.png";
 const dobleBurger = dobleBurgerAsset;
 import katrinaBurgerAsset from "@/assets/carta/katrina-burger.png";
 const katrinaBurger = katrinaBurgerAsset;
-import banoCheddarAsset from "@/assets/carta/bano-cheddar.jpg";
-const banoCheddar = banoCheddarAsset;
+
 import pizzaComunAsset from "@/assets/carta/pizza-comun.jpg";
 const pizzaComun = pizzaComunAsset;
 import pizzaEspecialAsset from "@/assets/carta/pizza-especial.jpg";
@@ -41,8 +39,7 @@ import charlyGratinadoAsset from "@/assets/carta/charly-gratinado.png";
 const charlyGratinado = charlyGratinadoAsset;
 import nachosDesiertoAsset from "@/assets/carta/nachos-desierto.jpg";
 const nachosDesierto = nachosDesiertoAsset;
-import picadaFriaAsset from "@/assets/carta/picada-fria.png";
-const picadaFria = picadaFriaAsset;
+
 import picadaCalienteAsset from "@/assets/carta/picada-caliente.jpg";
 const picadaCaliente = picadaCalienteAsset;
 import hotdogCallejeroAsset from "@/assets/carta/hotdog-callejero.jpg";
@@ -327,9 +324,6 @@ function MenuCard({
   index: number;
 }) {
   const { ref, visible } = useInView<HTMLDivElement>();
-  const orderText = `Quiero pedir: ${item.name}${
-    item.price ?? item.priceWhole ? ` (${item.price ?? item.priceWhole})` : ""
-  }`;
   const priceNode = !pizzaMode && item.price ? (
     <span
       className="whitespace-nowrap text-sm font-semibold"
@@ -379,13 +373,13 @@ function MenuCard({
               <PizzaPrice label="Media" value={item.priceHalf} />
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => requestOrder(orderText)}
-            className="mt-4 flex items-center justify-center gap-2 rounded-full bg-[#FF3D8A] px-4 py-2 text-sm font-semibold text-[#0E0A1A] transition hover:bg-[#ff5c9d]"
-          >
-            <MessageCircle size={16} /> Pedir este
-          </button>
+          <ItemOrderControls
+            name={item.name}
+            price={item.price}
+            pizzaMode={pizzaMode}
+            priceWhole={item.priceWhole}
+            priceHalf={item.priceHalf}
+          />
         </div>
       </div>
     </div>

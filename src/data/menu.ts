@@ -127,7 +127,6 @@ export const KATRINA_INFO = {
   direccion: "Egüés 517, Orán, Salta",
   horario: "Todos los días de 19:00 a 02:00 hs",
   whatsapp: "5493878631310",
-  instagram: "https://instagram.com/katrina.restobar",
 };
 
 export type MenuItemRow = {

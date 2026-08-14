@@ -3,6 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { PinGate } from "@/components/katrina/PinGate";
 import { MenuEditor } from "@/components/katrina/owner/MenuEditor";
+import { MesasActivas } from "@/components/katrina/owner/MesasActivas";
+import { Toaster } from "@/components/ui/sonner";
 
 const OWNER_PIN = import.meta.env.VITE_OWNER_PIN || process.env.OWNER_PIN || "5678";
 
@@ -121,9 +123,21 @@ function OwnerPage() {
 
   return (
     <div className="min-h-screen bg-[#0E0A1A] text-white">
-      <header className="border-b border-white/10 px-6 py-4">
-        <h1 className="text-lg font-semibold text-[#FF3D8A]">Dashboard</h1>
-        <p className="text-[11px] text-white/50">Actualiza en tiempo real</p>
+      <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+        <div>
+          <h1 className="text-lg font-semibold text-[#FF3D8A]">Dashboard</h1>
+          <p className="text-[11px] text-white/50">Actualiza en tiempo real</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            localStorage.removeItem("katrina_owner_pin_ok");
+            window.location.reload();
+          }}
+          className="h-11 rounded-md px-3 text-xs text-white/60 hover:text-white"
+        >
+          Salir
+        </button>
       </header>
       <main className="mx-auto max-w-5xl space-y-6 p-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -141,8 +155,10 @@ function OwnerPage() {
             ))
           )}
         </div>
+        <MesasActivas />
         <MenuEditor />
       </main>
+      <Toaster />
     </div>
   );
 }

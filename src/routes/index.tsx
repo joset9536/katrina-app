@@ -9,6 +9,9 @@ import { StarField } from "@/components/katrina/StarField";
 import { FloatingSigns } from "@/components/katrina/FloatingSigns";
 import { ChatPanel } from "@/components/katrina/ChatPanel";
 import { MobileBottomBar } from "@/components/katrina/MobileBottomBar";
+import { MesaBanner } from "@/components/katrina/MesaBanner";
+import { CartBar } from "@/components/katrina/CartBar";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -16,10 +19,11 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen bg-background pb-28 text-foreground md:pb-0">
       <StarField />
       <div className="relative z-10">
         <SiteHeader />
+        <MesaBanner />
         <main>
           <Hero />
           <MenuGrid />
@@ -30,7 +34,9 @@ function Index() {
       </div>
       <FloatingSigns />
       <ChatPanel />
+      <CartBar />
       <MobileBottomBar />
+      <Toaster />
     </div>
   );
 }

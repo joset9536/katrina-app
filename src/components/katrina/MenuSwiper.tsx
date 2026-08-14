@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import { MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { requestOrder } from "@/lib/order-bridge";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { MenuItem } from "@/data/menu";
+import { ItemOrderControls } from "./ItemOrderControls";
 
 export type FlatMenuItem = MenuItem & {
   photo?: string;
@@ -47,9 +47,7 @@ export function MenuSwiper({
   const indexInCategory =
     pos - flat.findIndex((it) => it.categoryIndex === item.categoryIndex) + 1;
   const categoryTotal = flat.filter((it) => it.categoryIndex === item.categoryIndex).length;
-  const orderText = `Quiero pedir: ${item.name}${
-    item.price ?? item.priceWhole ? ` (${item.price ?? item.priceWhole})` : ""
-  }`;
+
 
   return (
     <div className="md:hidden">
@@ -137,13 +135,13 @@ export function MenuSwiper({
                 </div>
               </div>
             )}
-            <button
-              type="button"
-              onClick={() => requestOrder(orderText)}
-              className="mt-4 flex items-center justify-center gap-2 rounded-full bg-[#FF3D8A] px-4 py-2 text-sm font-semibold text-[#0E0A1A]"
-            >
-              <MessageCircle size={16} /> Pedir este
-            </button>
+            <ItemOrderControls
+              name={item.name}
+              price={item.price}
+              pizzaMode={item.pizzaMode}
+              priceWhole={item.priceWhole}
+              priceHalf={item.priceHalf}
+            />
           </div>
         </div>
 
@@ -152,7 +150,7 @@ export function MenuSwiper({
           aria-label="Plato anterior"
           onClick={() => goTo(pos - 1)}
           disabled={pos === 0}
-          className="absolute left-1 top-[35%] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm disabled:opacity-0"
+          className="absolute left-1 top-[35%] flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm disabled:opacity-0"
         >
           <ChevronLeft size={20} />
         </button>
@@ -161,7 +159,7 @@ export function MenuSwiper({
           aria-label="Siguiente plato"
           onClick={() => goTo(pos + 1)}
           disabled={pos === flat.length - 1}
-          className="absolute right-1 top-[35%] flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm disabled:opacity-0"
+          className="absolute right-1 top-[35%] flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm disabled:opacity-0"
         >
           <ChevronRight size={20} />
         </button>

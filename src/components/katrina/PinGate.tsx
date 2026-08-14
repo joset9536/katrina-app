@@ -50,12 +50,12 @@ export function PinGate({
             }}
             placeholder="Clave"
             autoFocus
-            className="w-full rounded-md border border-white/15 bg-black/40 px-3 py-2 text-sm focus:border-[#FF3D8A] focus:outline-none"
+            className="h-12 w-full rounded-md border border-white/15 bg-black/40 px-3 text-sm focus:border-[#FF3D8A] focus:outline-none"
           />
           {error && <p className="text-xs text-red-400">Clave incorrecta.</p>}
           <button
             type="submit"
-            className="w-full rounded-md bg-[#FF3D8A] py-2 text-sm font-semibold text-[#0E0A1A]"
+            className="h-12 w-full rounded-md bg-[#FF3D8A] text-sm font-semibold text-[#0E0A1A] active:scale-[0.99]"
           >
             Entrar
           </button>

@@ -82,6 +82,75 @@ export type Database = {
           },
         ]
       }
+      menu_items: {
+        Row: {
+          category_id: string
+          description: string | null
+          id: string
+          name: string
+          photo_key: string
+          price: string | null
+          price_half: string | null
+          price_whole: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          description?: string | null
+          id?: string
+          name: string
+          photo_key: string
+          price?: string | null
+          price_half?: string | null
+          price_whole?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          description?: string | null
+          id?: string
+          name?: string
+          photo_key?: string
+          price?: string | null
+          price_half?: string | null
+          price_whole?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pedidos: {
+        Row: {
+          cliente_nombre: string
+          created_at: string
+          id: string
+          items: Json
+          llamado_id: string | null
+          mesa_id: string
+          status: string
+        }
+        Insert: {
+          cliente_nombre: string
+          created_at?: string
+          id?: string
+          items?: Json
+          llamado_id?: string | null
+          mesa_id: string
+          status?: string
+        }
+        Update: {
+          cliente_nombre?: string
+          created_at?: string
+          id?: string
+          items?: Json
+          llamado_id?: string | null
+          mesa_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       mesas: {
         Row: {
           estado: string

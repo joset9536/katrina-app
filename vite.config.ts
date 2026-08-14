@@ -18,6 +18,6 @@ export default defineConfig({
   // si no está seteada (build local o en Hostinger), cae en node-server.
   // Este override solo aplica fuera del sandbox de Lovable (ver README del paquete).
   nitro: {
-    preset: process.env.NITRO_PRESET || "node-server",
+    preset: process.env.NITRO_PRESET || (process.env.VERCEL ? "vercel" : "node-server"),
   },
 });

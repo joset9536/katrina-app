@@ -109,6 +109,8 @@
   html {
     /* Custom slow scroll handled in JS; leave native as auto to avoid conflicts */
     scroll-behavior: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -129,6 +131,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: color-mix(in oklab, var(--neon-pink) 25%, transparent);
     background-image:
       radial-gradient(ellipse at 20% 0%, color-mix(in oklab, var(--neon-purple) 12%, transparent), transparent 55%),
       radial-gradient(ellipse at 85% 15%, color-mix(in oklab, var(--neon-red) 8%, transparent), transparent 50%);

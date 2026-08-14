@@ -1,22 +1,7 @@
-import { Instagram, MapPin, Clock, Phone, Facebook } from "lucide-react";
+import { MapPin, Clock, Phone } from "lucide-react";
 import { KatrinaMark } from "./KatrinaMark";
 import { useInView } from "@/hooks/use-in-view";
 import { whatsappOrderUrl } from "@/lib/whatsapp";
-
-function TikTokIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width={size}
-      height={size}
-      fill="currentColor"
-      aria-hidden
-    >
-      <path d="M16.5 3a5.5 5.5 0 0 0 5 3.2v3.1a8.6 8.6 0 0 1-5-1.6v6.9a6.4 6.4 0 1 1-6.4-6.4c.3 0 .6 0 .9.1v3.2a3.2 3.2 0 1 0 2.3 3.1V3h3.2z" />
-    </svg>
-  );
-}
 
 export function SiteFooter() {
   const { ref, visible } = useInView<HTMLDivElement>();
@@ -62,33 +47,9 @@ export function SiteFooter() {
                 href={whatsappOrderUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="nav-link inline-flex items-center gap-2 text-sm"
+                className="nav-link inline-flex min-h-11 items-center gap-2 text-sm"
               >
-                <Phone size={16} /> WhatsApp
-              </a>
-              <a
-                href="https://instagram.com/katrina.restobar"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-link inline-flex items-center gap-2 text-sm"
-              >
-                <Instagram size={16} /> Instagram
-              </a>
-              <a
-                href="https://facebook.com/katrina.restobar"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-link inline-flex items-center gap-2 text-sm"
-              >
-                <Facebook size={16} /> Facebook
-              </a>
-              <a
-                href="https://tiktok.com/@katrina.restobar"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-link inline-flex items-center gap-2 text-sm"
-              >
-                <TikTokIcon /> TikTok
+                <Phone size={16} /> WhatsApp 3878 631310
               </a>
             </div>
           </div>

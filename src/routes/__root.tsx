@@ -17,16 +17,16 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Esta página no existe</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          El enlace está mal o la mesa no corresponde. Volvé al inicio o pedile el QR al mozo.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
           >
-            Go home
+            Ir al inicio
           </Link>
         </div>
       </div>
@@ -45,10 +45,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          Esta página no cargó
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Hubo un problema. Probá de nuevo o volvé al inicio.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -56,15 +56,15 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
           >
-            Try again
+            Reintentar
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex h-11 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium text-foreground"
           >
-            Go home
+            Ir al inicio
           </a>
         </div>
       </div>
@@ -77,22 +77,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Katrina — Cocktail Bar · Orán" },
+      { title: "Katrina — Restobar · Orán" },
       {
         name: "description",
         content:
-          "Katrina · Cocktail bar en Orán. Coctelería de autor, ambiente nocturno y ritual. Reservá tu mesa por WhatsApp.",
+          "Katrina, restobar en Egüés 517, Orán. Carta, neón y pedido a la mesa. WhatsApp 3878 631310.",
       },
-      { property: "og:title", content: "Katrina — Cocktail Bar · Orán" },
+      { property: "og:title", content: "Katrina — Restobar · Orán" },
       {
         property: "og:description",
-        content: "Katrina · Cocktail bar en Orán. Coctelería de autor, ambiente nocturno y ritual. Reservá tu mesa por WhatsApp.",
+        content: "Katrina, restobar en Egüés 517, Orán. Carta, neón y pedido a la mesa.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#0b0a12" },
-      { name: "twitter:title", content: "Katrina — Cocktail Bar · Orán" },
-      { name: "twitter:description", content: "Katrina · Cocktail bar en Orán. Coctelería de autor, ambiente nocturno y ritual. Reservá tu mesa por WhatsApp." },
+      { name: "twitter:title", content: "Katrina — Restobar · Orán" },
+      { name: "twitter:description", content: "Katrina, restobar en Egüés 517, Orán. Carta y pedido a la mesa." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/166f27cc-cc44-456e-b913-b814ffc1ad38/id-preview-b1c384f0--f1c81c5c-550d-4cca-b2b1-62bd01251e05.lovable.app-1783989257103.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/166f27cc-cc44-456e-b913-b814ffc1ad38/id-preview-b1c384f0--f1c81c5c-550d-4cca-b2b1-62bd01251e05.lovable.app-1783989257103.png" },
     ],
@@ -121,7 +121,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <HeadContent />
       </head>
