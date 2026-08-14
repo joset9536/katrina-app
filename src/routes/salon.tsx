@@ -14,8 +14,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   clearSesion,
-  countLocalUsuarios,
-  crearGerente,
+  ensureBrendaGerente,
+  GERENTE_NOMBRE,
   elegirClave,
   entrarConClave,
   loginNombre,
@@ -62,7 +62,7 @@ async function cerrarTurno(turnoId: string | null) {
 
 function SalonPage() {
   const [sesion, setSesion] = useState<SalonSesion | null>(null);
-  const [boot, setBoot] = useState<"vacio" | "login">("vacio");
+  const [boot, setBoot] = useState<"login">("login");
   const [tab, setTab] = useState<"mozo" | "gerencia">("mozo");
   const [turnoId, setTurnoId] = useState<string | null>(null);
   const [nombre, setNombre] = useState("");
@@ -71,14 +71,26 @@ function SalonPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    ensureBrendaGerente();
     const existing = readSesion();
-    if (existing) {
-      setSesion(existing);
-      setTurnoId(localStorage.getItem(STORAGE_TURNO));
+    if (existing && existing.rol === "gerente" && existing.nombre.toLowerCase() !== GERENTE_NOMBRE.toLowerCase()) {
+      clearSesion();
+      setNombre(GERENTE_NOMBRE);
       setBoot("login");
       return;
     }
-    setBoot(countLocalUsuarios() > 0 ? "login" : "vacio");
+    if (existing) {
+      const still =
+        existing.nombre.toLowerCase() === GERENTE_NOMBRE.toLowerCase()
+          ? { ...existing, nombre: GERENTE_NOMBRE, rol: "gerente" as const }
+          : existing;
+      writeSesion(still);
+      setSesion(still);
+      setTurnoId(localStorage.getItem(STORAGE_TURNO));
+    } else {
+      setNombre(GERENTE_NOMBRE);
+    }
+    setBoot("login");
   }, []);
 
   useEffect(() => {
@@ -98,20 +110,6 @@ function SalonPage() {
       setTurnoId(id);
     }
     setTab(s.rol === "gerente" ? "gerencia" : "mozo");
-  };
-
-  const crearPrimero = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (busy) return;
-    setBusy(true);
-    const res = await crearGerente(nombre, clave);
-    setBusy(false);
-    if (res.error || !res.sesion) {
-      toast.error(res.error || "No se pudo crear.");
-      return;
-    }
-    toast.success("Listo. Este es el usuario del gerente.");
-    afterLogin(res.sesion);
   };
 
   const seguirNombre = async (e: React.FormEvent) => {
@@ -170,30 +168,7 @@ function SalonPage() {
           <KatrinaMark size={72} className="mx-auto" />
           <h1 className="text-center text-xl font-semibold text-[#C4A35A]">Iniciar sesión</h1>
 
-          {boot === "vacio" ? (
-            <form onSubmit={crearPrimero} className="space-y-3">
-              <p className="text-center text-xs text-white/60">
-                Primera vez. Este usuario es el gerente. Después él da de alta a los mozos.
-              </p>
-              <input
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                placeholder="Tu nombre (ej: José)"
-                className="h-12 w-full rounded-md border border-white/15 bg-black/40 px-3 text-sm"
-                autoFocus
-              />
-              <input
-                type="password"
-                value={clave}
-                onChange={(e) => setClave(e.target.value)}
-                placeholder="Elegí tu clave"
-                className="h-12 w-full rounded-md border border-white/15 bg-black/40 px-3 text-sm"
-              />
-              <button type="submit" disabled={busy} className="h-12 w-full rounded-md bg-[#C4A35A] text-sm font-semibold text-[#12080e] disabled:opacity-50">
-                {busy ? "Creando…" : "Crear gerente"}
-              </button>
-            </form>
-          ) : pendiente ? (
+          {pendiente ? (
             <form onSubmit={confirmarClave} className="space-y-3">
               <p className="text-center text-xs text-white/60">
                 {pendiente.tiene_clave
@@ -217,11 +192,11 @@ function SalonPage() {
             </form>
           ) : (
             <form onSubmit={seguirNombre} className="space-y-3">
-              <p className="text-center text-xs text-white/60">Tu nombre. El gerente te tiene que haber cargado.</p>
+              <p className="text-center text-xs text-white/60">Gerente: Brenda. Los mozos, el nombre que les cargó ella.</p>
               <input
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Romy"
+                placeholder="Brenda"
                 className="h-12 w-full rounded-md border border-white/15 bg-black/40 px-3 text-sm"
                 autoFocus
               />

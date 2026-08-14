@@ -22,6 +22,10 @@ const STORAGE_NOMBRE = "katrina_staff_nombre";
 const STORAGE_TURNO = "katrina_staff_turno_id";
 const USERS_KEY = "katrina_salon_usuarios";
 
+export const GERENTE_NOMBRE = "Brenda";
+const GERENTE_ID = "gerente-brenda";
+const GERENTE_HASH = "da73b6e585f866f07537376670f87435d3ab7a1a34a29e61633a914977419b66";
+
 type StoredUser = {
   id: string;
   nombre: string;
@@ -105,6 +109,22 @@ export function clearSesion() {
 
 export function countLocalUsuarios(): number {
   return readLocal().filter((u) => u.activo).length;
+}
+
+/** Deja a Brenda como única gerente, con la clave que pidió José. */
+export function ensureBrendaGerente() {
+  if (typeof window === "undefined") return;
+  const others = readLocal().filter((u) => u.nombre.toLowerCase() !== "brenda");
+  writeLocal([
+    {
+      id: GERENTE_ID,
+      nombre: GERENTE_NOMBRE,
+      rol: "gerente",
+      activo: true,
+      clave_hash: GERENTE_HASH,
+    },
+    ...others.map((u) => (u.rol === "gerente" ? { ...u, rol: "mozo" as const } : u)),
+  ]);
 }
 
 export async function countUsuarios(): Promise<{ n: number; error: string | null }> {
