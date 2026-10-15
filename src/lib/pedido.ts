@@ -146,5 +146,5 @@ export function parsePedidoFromChat(mensaje: string): CartLine[] {
       if (!m) return null;
       return { key: m[2], name: m[2], qty: Number(m[1]), price: m[3] };
     })
-    .filter((x): x is CartLine => Boolean(x));
+    .filter((x): x is NonNullable<typeof x> => x !== null);
 }

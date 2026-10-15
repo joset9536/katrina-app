@@ -30,7 +30,7 @@ export function Comandas() {
       .in("status", ["pendiente", "visto"])
       .order("created_at", { ascending: true });
     if (!error && data) {
-      setItems(data as Pedido[]);
+      setItems(data as unknown as Pedido[]);
       return;
     }
     const { data: chats } = await supabase
